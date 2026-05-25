@@ -11,6 +11,7 @@ React · Vite · Vercel 배포.
 
 위젯([design-widget-schedule](https://github.com/Peekaboo325/design-widget-schedule))이
 개인 디자이너의 "배정 업무"를 담당한다면,
+
 허브는 팀 전체가 "어떻게 돌아가는지"를 담당합니다.
 
 ---
