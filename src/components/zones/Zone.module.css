@@ -61,6 +61,42 @@
   }
 }
 
+/* 종류 라벨 행 — 라벨 좌측 + 오프라인 전환 링크 우측 */
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.channelSwitch {
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.channelSwitch:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+/* 수량 + 비고 한 줄 — 수량 좁게(100px), 비고는 나머지 전부 */
+.qtyNoteRow {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: var(--space-field);
+  align-items: start;
+}
+
+@media (max-width: 560px) {
+  .qtyNoteRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 일정 카드 전용 — 좌측: 날짜 두 개 / 우측: 빠른 선택 칩.
    넓은 화면에선 카드 우측 빈 공간을 빠른 선택이 채움. */
 .deadlineSplit {

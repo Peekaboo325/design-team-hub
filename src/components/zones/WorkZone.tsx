@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormState, WorkRow } from '../../types'
 import { WORK_TYPES, ONLINE_DEFAULT_CATEGORIES, type Channel } from '../../data/team'
 import { Chip } from '../ui/Chip'
-import { TextInput, TextArea } from '../ui/TextInput'
+import { TextInput } from '../ui/TextInput'
 import styles from './Zone.module.css'
 
 type Props = {
@@ -20,15 +20,14 @@ export function WorkZone({ value, onChange }: Props) {
     onChange({ work: { ...work, ...patch } })
   }
 
-  // 온/오프 토글 — 칩 한 번 누르면 반대편으로 전환. 종류·상세는 채널 바뀌면 리셋.
+  // 오프라인 ↔ 온라인 전환 링크 — 1-2회/년 동선이라 칩이 아닌 텍스트 링크로
   const toggleChannel = () => {
     const next: Channel = work.channel === 'offline' ? 'online' : 'offline'
     updateWork({ channel: next, category: '', detail: '' })
+    setShowAllOnline(false)
   }
 
-  const channelLabel = work.channel === 'offline' ? '오프라인' : '온라인'
-
-  // 종류 후보 계산 — 채널 / 더보기 상태 / 현재 선택에 따라 다름
+  // 종류 후보 — 채널 / 더보기 / 선택값에 따라 달라짐
   const allCategories = work.channel ? Object.keys(WORK_TYPES[work.channel]) : []
   const defaultOnline = [...ONLINE_DEFAULT_CATEGORIES] as string[]
   const restOnline = allCategories.filter((c) => !defaultOnline.includes(c))
@@ -39,7 +38,6 @@ export function WorkZone({ value, onChange }: Props) {
   } else if (showAllOnline) {
     visibleCategories = [...defaultOnline, ...restOnline]
   } else {
-    // 접힘 상태: 기본 6개만. 단 현재 선택이 기본 밖이면 그것도 함께 보이게
     visibleCategories =
       work.category && !defaultOnline.includes(work.category)
         ? [...defaultOnline, work.category]
@@ -58,22 +56,23 @@ export function WorkZone({ value, onChange }: Props) {
       <header className={styles.header}>
         <h2 className={styles.title}>작업 정보</h2>
         <p className={styles.subtitle}>
-          온/오프 → 종류 → 상세 순으로 선택. 소재가 여러 개면 다음 단계에서 [+] 복제 예정.
+          종류 → 상세 순으로 선택. 기본 온라인. 소재가 여러 개면 다음 단계에서 [+] 복제 예정.
         </p>
       </header>
 
       <div className={styles.body}>
-        {/* 온/오프 — 단일 토글 칩. 클릭하면 반대편으로 전환. */}
+        {/* 종류 — 라벨 우측에 오프라인 전환 링크 (1-2회/년 동선이라 작게) */}
         <div>
-          <span className={styles.fieldLabel}>온/오프</span>
-          <div className={styles.chips}>
-            <Chip label={`${channelLabel} ↔`} selected onClick={toggleChannel} />
+          <div className={styles.categoryHeader}>
+            <span className={styles.fieldLabel}>종류</span>
+            <button
+              type="button"
+              className={styles.channelSwitch}
+              onClick={toggleChannel}
+            >
+              {work.channel === 'online' ? '오프라인 종류 →' : '← 온라인 종류'}
+            </button>
           </div>
-        </div>
-
-        {/* 종류 — 온라인은 기본 6개 + 더보기, 오프라인은 전체 */}
-        <div>
-          <span className={styles.fieldLabel}>종류</span>
           <div className={styles.chips}>
             {visibleCategories.map((cat) => (
               <Chip
@@ -117,24 +116,23 @@ export function WorkZone({ value, onChange }: Props) {
           </div>
         )}
 
-        {/* 수량 */}
-        <TextInput
-          type="number"
-          label="수량"
-          placeholder="숫자만"
-          inputMode="numeric"
-          min={1}
-          value={work.quantity}
-          onChange={(e) => updateWork({ quantity: e.target.value })}
-        />
-
-        {/* 비고 (소재별) */}
-        <TextArea
-          label="비고"
-          placeholder="이 소재만의 특이사항 (선택)"
-          value={work.note}
-          onChange={(e) => updateWork({ note: e.target.value })}
-        />
+        {/* 수량 + 비고 — 한 줄. 수량 좁게, 비고 와이드. */}
+        <div className={styles.qtyNoteRow}>
+          <TextInput
+            type="number"
+            label="수량"
+            inputMode="numeric"
+            min={1}
+            value={work.quantity}
+            onChange={(e) => updateWork({ quantity: e.target.value })}
+          />
+          <TextInput
+            label="비고"
+            placeholder="이 소재만의 특이사항 (선택)"
+            value={work.note}
+            onChange={(e) => updateWork({ note: e.target.value })}
+          />
+        </div>
       </div>
     </section>
   )

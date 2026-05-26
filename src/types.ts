@@ -35,7 +35,7 @@ export const EMPTY_WORK_ROW: WorkRow = {
   channel: 'online',   // 기본 온라인 — 카드 열자마자 종류 칩이 보이게
   category: '',
   detail: '',
-  quantity: '',
+  quantity: '1',       // 기본 수량 1 (대부분의 의뢰가 수량 1로 시작)
   note: '',
 }
 
@@ -58,29 +58,40 @@ function isWeekend(d: Date): boolean {
   return dow === 0 || dow === 6  // 0=일, 6=토
 }
 
-// 주말이면 다음 평일로 굴림 (in-place)
-function rollToNextBusinessDay(d: Date): void {
-  while (isWeekend(d)) {
+// 비영업일 여부 (토/일 + 공휴일)
+function isNonBusinessDay(d: Date, holidays: readonly string[]): boolean {
+  if (isWeekend(d)) return true
+  return holidays.includes(ymd(d))
+}
+
+// 비영업일이면 다음 영업일로 굴림 (in-place)
+function rollToNextBusinessDay(d: Date, holidays: readonly string[]): void {
+  while (isNonBusinessDay(d, holidays)) {
     d.setDate(d.getDate() + 1)
   }
 }
 
-// 오늘이지만 영업일이 아니면 그다음 영업일
-export function todayBusinessDay(): string {
+// 당일이지만 영업일이 아니면(주말·공휴일) 그다음 영업일
+export function todayBusinessDay(holidays: readonly string[] = []): string {
   const d = new Date()
-  rollToNextBusinessDay(d)
+  rollToNextBusinessDay(d, holidays)
   return ymd(d)
 }
 
 // 기준일에서 N영업일 뒤 (기준일 비어있으면 오늘 기준).
-// 기준일이 주말이면 먼저 다음 영업일로 굴린 후 N영업일 추가.
-export function addBusinessDays(baseDate: string, days: number): string {
+// 기준일이 비영업일이면 먼저 다음 영업일로 굴린 후 N영업일 추가.
+// 추가 중 만나는 토/일/공휴일은 카운트하지 않고 건너뜀.
+export function addBusinessDays(
+  baseDate: string,
+  days: number,
+  holidays: readonly string[] = [],
+): string {
   const d = baseDate ? new Date(baseDate) : new Date()
-  rollToNextBusinessDay(d)
+  rollToNextBusinessDay(d, holidays)
   let remaining = days
   while (remaining > 0) {
     d.setDate(d.getDate() + 1)
-    if (!isWeekend(d)) {
+    if (!isNonBusinessDay(d, holidays)) {
       remaining--
     }
   }
