@@ -46,6 +46,25 @@
   padding: 0 4px;
 }
 
+/* 등록 결과 피드백 — 푸터 위 한 줄. 사용자 입력 시작하면 자동 사라짐. */
+.feedback {
+  padding: 14px 18px;
+  border-radius: var(--radius-input);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  text-align: center;
+}
+
+.feedbackOk {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
+.feedbackError {
+  background: rgba(240, 68, 82, 0.08);
+  color: var(--color-danger);
+}
+
 @media (max-width: 560px) {
   .page {
     padding: 32px 16px 100px;
