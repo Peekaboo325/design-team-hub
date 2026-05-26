@@ -35,19 +35,15 @@
   gap: 16px;
 }
 
+/* 푸터 — 초기화는 좌측(약한 톤), 등록은 우측(주된 액션).
+   둘이 멀리 떨어져 있어야 실수로 초기화를 누르는 사고가 없음. */
 .footer {
   display: flex;
-  justify-content: flex-end;     /* 와이드에서 버튼 우측 정렬 */
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
   margin-top: 8px;
   padding: 0 4px;
-}
-
-/* 좁은 화면 (모바일): 버튼은 전체폭으로 폴백 */
-@media (max-width: 560px) {
-  .footer {
-    justify-content: stretch;
-  }
 }
 
 @media (max-width: 560px) {

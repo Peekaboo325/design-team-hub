@@ -1,42 +1,41 @@
 import type { Channel } from './data/team'
 
-// 폼 한 줄 단위 상태 (메타 한 건. [+]로 복제될 때 이 단위가 늘어남)
-// 1단계에선 한 줄만. [+] 복제는 §만드는 순서 6번에서.
-export type WorkRow = {
-  channel: Channel | null         // 온/오프
-  category: string                // 종류 (예: 'KV')
-  detail: string                  // 상세 (예: '베이직'). 상세 없는 종류는 ''
-  quantity: string                // 수량 (텍스트 상태로 보유, 등록 시 숫자 변환)
-  note: string                    // 비고 (소재별)
+// 소재 한 줄 — 수량과 비고는 소재마다 다를 수 있음.
+// 다른 작업 정보(채널·종류·상세)는 모든 소재가 공유.
+export type Material = {
+  quantity: string                // 수량 (텍스트로 보유, 등록 시 숫자 변환)
+  note: string                    // 비고 (이 소재만의 특이사항)
 }
 
 // 폼 전체 상태
 export type FormState = {
-  // 메일 존
+  // 메일
   mailTitle: string
   mailNote: string
 
-  // 작성자 존
+  // 작성자
   advertiser: string              // ADVERTISERS 중 하나 또는 직접 입력값
-  advertiserIsCustom: boolean     // 직접 입력 모드 여부
+  advertiserIsCustom: boolean
   team: string                    // TEAMS 중 하나 또는 직접 입력값
   teamIsCustom: boolean
   requester: string               // REQUESTERS[team] 중 하나 또는 직접 입력값
   requesterIsCustom: boolean
 
-  // 마감일 존
+  // 일정
   requestDate: string             // YYYY-MM-DD (기본: 오늘)
   deadline: string                // YYYY-MM-DD
 
-  // 작업 존 — 1단계는 한 줄. [+]로 늘어날 때 배열로 확장 예정.
-  work: WorkRow
+  // 작업 — 공유 정보
+  channel: Channel | null
+  category: string                // 종류 (예: 'KV')
+  detail: string                  // 상세 (예: '베이직'). 상세 없는 종류는 ''
+
+  // 작업 — 소재 N개 (한 의뢰가 여러 소재로 쪼개지는 경우)
+  materials: Material[]
 }
 
-export const EMPTY_WORK_ROW: WorkRow = {
-  channel: 'online',   // 기본 온라인 — 카드 열자마자 종류 칩이 보이게
-  category: '',
-  detail: '',
-  quantity: '1',       // 기본 수량 1 (대부분의 의뢰가 수량 1로 시작)
+export const EMPTY_MATERIAL: Material = {
+  quantity: '1',                  // 대부분의 의뢰가 수량 1로 시작
   note: '',
 }
 
@@ -110,5 +109,8 @@ export const INITIAL_FORM_STATE: FormState = {
   requesterIsCustom: false,
   requestDate: today(),
   deadline: '',
-  work: { ...EMPTY_WORK_ROW },
+  channel: 'online',
+  category: '',
+  detail: '',
+  materials: [{ ...EMPTY_MATERIAL }],
 }

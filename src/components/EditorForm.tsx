@@ -28,7 +28,8 @@ export function EditorForm() {
       </div>
 
       <footer className={styles.footer}>
-        <Button variant="secondary" onClick={() => setForm(INITIAL_FORM_STATE)}>
+        {/* 초기화는 등록과 멀리 떨어진 좌측, 가장 약한 톤(ghost)으로. */}
+        <Button variant="ghost" onClick={() => setForm(INITIAL_FORM_STATE)}>
           초기화
         </Button>
         <Button

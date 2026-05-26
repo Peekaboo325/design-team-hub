@@ -37,6 +37,18 @@
   background: #E5E8EB;
 }
 
+/* Ghost — 가장 약한 톤. 초기화처럼 실수로 누르면 안되는 액션용. */
+.ghost {
+  background: transparent;
+  color: var(--color-text-tertiary);
+  font-weight: 600;
+}
+
+.ghost:hover {
+  background: #F2F4F6;
+  color: var(--color-text-secondary);
+}
+
 .fullWidth {
   width: 100%;
 }
