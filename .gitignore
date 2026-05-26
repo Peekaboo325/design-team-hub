@@ -1,0 +1,12 @@
+node_modules
+dist
+.vite
+.env
+.env.local
+.DS_Store
+*.log
+
+# tsc -b composite 빌드 산출물 (커밋 X)
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
