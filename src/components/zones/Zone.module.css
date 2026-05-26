@@ -48,6 +48,37 @@
   }
 }
 
+/* 일정 카드 전용 — 좌측: 날짜 두 개 / 우측: 빠른 선택 칩.
+   넓은 화면에선 카드 우측 빈 공간을 빠른 선택이 채움. */
+.deadlineSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 660px) 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.deadlineDates {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 320px);
+  gap: var(--space-field);
+}
+
+.deadlineQuick {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+  .deadlineSplit {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .deadlineDates {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 칩 묶음 (광고주, 팀, 디자이너 등 후보 나열) */
 .chips {
   display: flex;
