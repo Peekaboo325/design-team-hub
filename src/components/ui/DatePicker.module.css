@@ -52,8 +52,8 @@
 
 /* react-day-picker v9 테마 — CSS 변수로 토스 톤 주입 */
 .popover :global(.rdp-root) {
-  --rdp-accent-color: var(--color-primary);
-  --rdp-accent-background-color: var(--color-primary-soft);
+  --rdp-accent-color: #fff;                          /* 선택된 날 글자색: 흰색 */
+  --rdp-accent-background-color: var(--color-primary); /* 선택된 날 배경: 진한 파랑 (흰글자 잘 보이게) */
   --rdp-today-color: var(--color-primary);
   --rdp-day-height: 40px;
   --rdp-day-width: 40px;
@@ -98,10 +98,8 @@
   font-weight: 700;
 }
 
-/* 선택된 날은 색상 무관 흰 글자가 보이게 */
-.popover :global(.rdp-selected) .saturday,
-.popover :global(.rdp-selected) .sunday,
-.popover :global(.rdp-selected) .holiday,
-.popover :global(.rdp-selected .rdp-day_button) {
+/* 선택된 날 — 토/일/공휴일 색상보다 우선해서 흰 글자 보장
+   (v9의 .rdp-selected는 day_button에 직접 붙음 → 같은 element 클래스 결합) */
+.popover :global(.rdp-day_button.rdp-selected) {
   color: #fff !important;
 }
