@@ -17,9 +17,10 @@ export type FormState = {
   mailNote: string
 
   // 작성자 존
-  advertiser: string | null
+  advertiser: string              // ADVERTISERS 중 하나 또는 직접 입력값
+  advertiserIsCustom: boolean     // 직접 입력 모드 여부
   team: string                    // TEAMS 중 하나 또는 직접 입력값
-  teamIsCustom: boolean           // 직접 입력 모드 여부
+  teamIsCustom: boolean
   requester: string               // REQUESTERS[team] 중 하나 또는 직접 입력값
   requesterIsCustom: boolean
 
@@ -101,7 +102,8 @@ export function addBusinessDays(
 export const INITIAL_FORM_STATE: FormState = {
   mailTitle: '',
   mailNote: '',
-  advertiser: null,
+  advertiser: '',
+  advertiserIsCustom: false,
   team: '',
   teamIsCustom: false,
   requester: '',

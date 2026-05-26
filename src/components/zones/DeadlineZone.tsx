@@ -1,7 +1,7 @@
 import type { FormState } from '../../types'
 import { addBusinessDays, todayBusinessDay } from '../../types'
 import { HOLIDAYS } from '../../data/team'
-import { TextInput } from '../ui/TextInput'
+import { DatePicker } from '../ui/DatePicker'
 import { Chip } from '../ui/Chip'
 import styles from './Zone.module.css'
 
@@ -10,7 +10,7 @@ type Props = {
   onChange: (patch: Partial<FormState>) => void
 }
 
-// 마감일 빠른 선택 — 모두 영업일 기준(토/일 + 공휴일 스킵).
+// 마감일 빠른 선택 — 영업일 기준(토/일 + 공휴일 스킵).
 // '당일'은 오늘(주말·공휴일이면 다음 영업일), '+N일'은 접수일 기준 N영업일 뒤.
 const QUICK_OPTIONS: { label: string; days: number | 'today' }[] = [
   { label: '당일', days: 'today' },
@@ -40,17 +40,17 @@ export function DeadlineZone({ value, onChange }: Props) {
 
       <div className={styles.deadlineSplit}>
         <div className={styles.deadlineDates}>
-          <TextInput
-            type="date"
+          <DatePicker
             label="접수일"
             value={value.requestDate}
-            onChange={(e) => onChange({ requestDate: e.target.value })}
+            onChange={(d) => onChange({ requestDate: d })}
+            holidays={HOLIDAYS}
           />
-          <TextInput
-            type="date"
+          <DatePicker
             label="마감일"
             value={value.deadline}
-            onChange={(e) => onChange({ deadline: e.target.value })}
+            onChange={(d) => onChange({ deadline: d })}
+            holidays={HOLIDAYS}
           />
         </div>
 

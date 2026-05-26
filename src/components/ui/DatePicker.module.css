@@ -1,0 +1,99 @@
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* 트리거 버튼 — TextInput과 동일 톤 */
+.trigger {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.trigger:hover {
+  border-color: var(--color-border-strong);
+}
+
+.trigger:focus,
+.trigger.open {
+  border-color: var(--color-primary);
+}
+
+/* 팝오버 캘린더 */
+.popover {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 100;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 12px;
+}
+
+/* react-day-picker v9 테마 — CSS 변수로 토스 톤 주입 */
+.popover :global(.rdp-root) {
+  --rdp-accent-color: var(--color-primary);
+  --rdp-accent-background-color: var(--color-primary-soft);
+  --rdp-today-color: var(--color-primary);
+  --rdp-day-height: 40px;
+  --rdp-day-width: 40px;
+  --rdp-day_button-height: 36px;
+  --rdp-day_button-width: 36px;
+  --rdp-day_button-border-radius: 50%;
+  font-family: var(--font-family);
+  font-weight: 500;
+  margin: 0;
+}
+
+.popover :global(.rdp-month_caption) {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.popover :global(.rdp-weekday) {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  text-transform: none;
+}
+
+/* 토 = 파랑 / 일 = 빨강 / 공휴일 = 빨강·굵게 (한국 캘린더 관습) */
+.saturday {
+  color: #3B82F6;
+}
+.sunday {
+  color: #DC2626;
+}
+.holiday {
+  color: #DC2626;
+  font-weight: 700;
+}
+
+/* 선택된 날은 색상 무관 흰 글자가 보이게 */
+.popover :global(.rdp-selected) .saturday,
+.popover :global(.rdp-selected) .sunday,
+.popover :global(.rdp-selected) .holiday,
+.popover :global(.rdp-selected .rdp-day_button) {
+  color: #fff !important;
+}

@@ -128,7 +128,6 @@ export function WorkZone({ value, onChange }: Props) {
           />
           <TextInput
             label="비고"
-            placeholder="이 소재만의 특이사항 (선택)"
             value={work.note}
             onChange={(e) => updateWork({ note: e.target.value })}
           />
