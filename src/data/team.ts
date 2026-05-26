@@ -126,11 +126,26 @@ export const WORK_TYPES = {
 
 export type Channel = keyof typeof WORK_TYPES  // 'online' | 'offline'
 
-// 시트 저장용 포맷터 — UI 선택값을 "종류(난이도)" 한 문자열로.
-// 난이도가 비어 있으면 종류명만 반환.
+// ─────────────────────────────────────────────
+// 온라인 종류 기본 노출 6개 — 가장 많이 작업하는 것만 먼저 보이게.
+// 나머지 종류는 '더보기'로 접힘.
+// (작업의 97%가 온라인이라 온라인만 분할. 오프라인은 전체 표시.)
+// 순서가 곧 표시 순서. 자주 쓰는 종류가 바뀌면 이 배열만 수정.
+// ─────────────────────────────────────────────
+export const ONLINE_DEFAULT_CATEGORIES = [
+  '배너',
+  '웹진형페이지',
+  '정보형페이지',
+  '유지보수',
+  '사내',
+  '기타',
+] as const
+
+// 시트 저장용 포맷터 — UI 선택값을 "종류(상세)" 한 문자열로.
+// 상세가 비어 있으면 종류명만 반환.
 //   예: formatWorkType('KV', '베이직') → 'KV(베이직)'
 //       formatWorkType('카드뉴스', '') → '카드뉴스'
-export function formatWorkType(category: string, level: string): string {
+export function formatWorkType(category: string, detail: string): string {
   if (!category) return ''
-  return level ? `${category}(${level})` : category
+  return detail ? `${category}(${detail})` : category
 }

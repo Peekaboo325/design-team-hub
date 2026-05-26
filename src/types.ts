@@ -5,7 +5,7 @@ import type { Channel } from './data/team'
 export type WorkRow = {
   channel: Channel | null         // 온/오프
   category: string                // 종류 (예: 'KV')
-  level: string                   // 난이도 (예: '베이직'). 난이도 없는 종류는 ''
+  detail: string                  // 상세 (예: '베이직'). 상세 없는 종류는 ''
   quantity: string                // 수량 (텍스트 상태로 보유, 등록 시 숫자 변환)
   note: string                    // 비고 (소재별)
 }
@@ -34,7 +34,7 @@ export type FormState = {
 export const EMPTY_WORK_ROW: WorkRow = {
   channel: 'online',   // 기본 온라인 — 카드 열자마자 종류 칩이 보이게
   category: '',
-  level: '',
+  detail: '',
   quantity: '',
   note: '',
 }
