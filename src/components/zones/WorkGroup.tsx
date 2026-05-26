@@ -102,7 +102,11 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
               key={cat}
               label={cat}
               selected={value.category === cat}
-              onClick={() => onChange({ category: cat, detail: '' })}
+              onClick={() => {
+                // 같은 종류 다시 누르면 해제 (상세도 함께 클리어)
+                const isCurrent = value.category === cat
+                onChange({ category: isCurrent ? '' : cat, detail: '' })
+              }}
             />
           ))}
           {showMoreToggle &&
@@ -128,7 +132,10 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
                 key={d}
                 label={d}
                 selected={value.detail === d}
-                onClick={() => onChange({ detail: d })}
+                onClick={() => {
+                  const isCurrent = value.detail === d
+                  onChange({ detail: isCurrent ? '' : d })
+                }}
               />
             ))}
           </div>

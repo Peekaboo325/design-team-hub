@@ -60,7 +60,11 @@ export function DeadlineZone({ value, onChange }: Props) {
                   label={`${opt.label}(${day})`}
                   selected={value.deadline === target}
                   className={styles.quickChip}
-                  onClick={() => onChange({ deadline: target })}
+                  onClick={() => {
+                    // 이미 그 날짜로 선택돼 있으면 해제 (빈 마감일로)
+                    const isCurrent = value.deadline === target
+                    onChange({ deadline: isCurrent ? '' : target })
+                  }}
                 />
               )
             })}

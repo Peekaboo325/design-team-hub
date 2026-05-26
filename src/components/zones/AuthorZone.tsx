@@ -99,7 +99,14 @@ export function AuthorZone({ value, onChange }: Props) {
                 label={t}
                 selected={!value.teamIsCustom && value.team === t}
                 onClick={() => {
-                  onChange({ team: t, teamIsCustom: false, requester: '', requesterIsCustom: false })
+                  // 이미 선택된 팀을 다시 누르면 선택 해제. 요청자도 함께 클리어.
+                  const isCurrent = !value.teamIsCustom && value.team === t
+                  onChange({
+                    team: isCurrent ? '' : t,
+                    teamIsCustom: false,
+                    requester: '',
+                    requesterIsCustom: false,
+                  })
                   setShowAllAdvertisers(false)
                 }}
               />
@@ -140,7 +147,13 @@ export function AuthorZone({ value, onChange }: Props) {
                   key={name}
                   label={name}
                   selected={!value.requesterIsCustom && value.requester === name}
-                  onClick={() => onChange({ requester: name, requesterIsCustom: false })}
+                  onClick={() => {
+                    const isCurrent = !value.requesterIsCustom && value.requester === name
+                    onChange({
+                      requester: isCurrent ? '' : name,
+                      requesterIsCustom: false,
+                    })
+                  }}
                 />
               ))}
               {value.requesterIsCustom ? (
@@ -178,7 +191,13 @@ export function AuthorZone({ value, onChange }: Props) {
                   label={name}
                   selected={!value.advertiserIsCustom && value.advertiser === name}
                   muted={hasEmphasis && !requesterDefaults.includes(name)}
-                  onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
+                  onClick={() => {
+                    const isCurrent = !value.advertiserIsCustom && value.advertiser === name
+                    onChange({
+                      advertiser: isCurrent ? '' : name,
+                      advertiserIsCustom: false,
+                    })
+                  }}
                 />
               ))}
               {showAdvertiserMore &&
