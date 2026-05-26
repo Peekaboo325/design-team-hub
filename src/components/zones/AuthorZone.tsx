@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import type { FormState } from '../../types'
-import { ADVERTISERS, TEAMS, REQUESTERS } from '../../data/team'
+import { ADVERTISERS, ADVERTISERS_BY_TEAM, TEAMS, REQUESTERS } from '../../data/team'
 import { Chip } from '../ui/Chip'
 import { ChipInput } from '../ui/ChipInput'
 import { TextInput } from '../ui/TextInput'
@@ -20,12 +21,38 @@ function compareKoreanFirst(a: string, b: string): number {
 }
 
 export function AuthorZone({ value, onChange }: Props) {
-  const requesterCandidates =
-    !value.teamIsCustom && (TEAMS as readonly string[]).includes(value.team)
-      ? REQUESTERS[value.team as (typeof TEAMS)[number]]
-      : []
+  // 팀별 후보
+  const isInternalTeam = !value.teamIsCustom && (TEAMS as readonly string[]).includes(value.team)
+  const team = value.team as (typeof TEAMS)[number]
 
-  const sortedAdvertisers = [...ADVERTISERS].sort(compareKoreanFirst)
+  const requesterCandidates = isInternalTeam ? REQUESTERS[team] : []
+  const teamAdvertisers = isInternalTeam ? ADVERTISERS_BY_TEAM[team] : []
+
+  const sortedAllAdvertisers = [...ADVERTISERS].sort(compareKoreanFirst)
+  const sortedTeamAdvertisers = [...teamAdvertisers].sort(compareKoreanFirst)
+  const restAdvertisers = sortedAllAdvertisers.filter((a) => !teamAdvertisers.includes(a))
+
+  // 광고주 더보기 토글 — 팀이 정해진 경우만 의미 있음
+  const [showAllAdvertisers, setShowAllAdvertisers] = useState(false)
+
+  // 화면에 보일 광고주 칩 결정 — 케이스별
+  let visibleAdvertisers: string[] = []
+  if (value.teamIsCustom) {
+    // 외부 팀: 모든 광고주 (가나다순) — 더보기 없음
+    visibleAdvertisers = sortedAllAdvertisers
+  } else if (isInternalTeam) {
+    if (showAllAdvertisers) {
+      // 펼침: 자기 팀 + 나머지
+      visibleAdvertisers = [...sortedTeamAdvertisers, ...restAdvertisers]
+    } else {
+      // 접힘: 자기 팀만. 단 현재 선택이 자기 팀 외면 그것도 함께 표시 (선택값 사라지지 않게)
+      visibleAdvertisers =
+        value.advertiser && !value.advertiserIsCustom && !teamAdvertisers.includes(value.advertiser)
+          ? [...sortedTeamAdvertisers, value.advertiser]
+          : sortedTeamAdvertisers
+    }
+  }
+  const showAdvertiserMore = isInternalTeam && restAdvertisers.length > 0
 
   return (
     <section className={styles.card}>
@@ -57,9 +84,10 @@ export function AuthorZone({ value, onChange }: Props) {
                 key={t}
                 label={t}
                 selected={!value.teamIsCustom && value.team === t}
-                onClick={() =>
+                onClick={() => {
                   onChange({ team: t, teamIsCustom: false, requester: '', requesterIsCustom: false })
-                }
+                  setShowAllAdvertisers(false)
+                }}
               />
             ))}
             {value.teamIsCustom ? (
@@ -71,16 +99,17 @@ export function AuthorZone({ value, onChange }: Props) {
               <Chip
                 label="직접 입력"
                 variant="ghost"
-                onClick={() =>
+                onClick={() => {
                   onChange({ team: '', teamIsCustom: true, requester: '', requesterIsCustom: true })
-                }
+                  setShowAllAdvertisers(false)
+                }}
               />
             )}
           </div>
         </div>
 
         {/* 요청자 — 팀 따라 후보 또는 직접 입력 (인라인).
-            팀 미선택이면 '팀을 먼저 선택해주세요' 비활성 칩으로 영역 유지 (덜컹거림 방지). */}
+            팀 미선택이면 '팀을 먼저 선택해주세요' 비활성 칩으로 영역 유지. */}
         <div>
           <span className={styles.fieldLabel}>요청자(기획자)</span>
           {value.teamIsCustom ? (
@@ -120,31 +149,51 @@ export function AuthorZone({ value, onChange }: Props) {
           )}
         </div>
 
-        {/* 광고주 — 칩 + 직접 입력 (인라인) */}
+        {/* 광고주 — 팀별 후보 + 더보기 + 직접 입력. 팀 미선택이면 비활성 칩. */}
         <div>
           <span className={styles.fieldLabel}>광고주</span>
-          <div className={styles.chips}>
-            {sortedAdvertisers.map((name) => (
-              <Chip
-                key={name}
-                label={name}
-                selected={!value.advertiserIsCustom && value.advertiser === name}
-                onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
-              />
-            ))}
-            {value.advertiserIsCustom ? (
-              <ChipInput
-                value={value.advertiser}
-                onChange={(e) => onChange({ advertiser: e.target.value })}
-              />
-            ) : (
-              <Chip
-                label="직접 입력"
-                variant="ghost"
-                onClick={() => onChange({ advertiser: '', advertiserIsCustom: true })}
-              />
-            )}
-          </div>
+          {!value.teamIsCustom && !isInternalTeam ? (
+            <div className={styles.chips}>
+              <Chip label="팀을 먼저 선택해주세요" variant="ghost" disabled />
+            </div>
+          ) : (
+            <div className={styles.chips}>
+              {visibleAdvertisers.map((name) => (
+                <Chip
+                  key={name}
+                  label={name}
+                  selected={!value.advertiserIsCustom && value.advertiser === name}
+                  onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
+                />
+              ))}
+              {showAdvertiserMore &&
+                (showAllAdvertisers ? (
+                  <Chip
+                    label="접기"
+                    variant="ghost"
+                    onClick={() => setShowAllAdvertisers(false)}
+                  />
+                ) : (
+                  <Chip
+                    label={`더보기 (${restAdvertisers.length})`}
+                    variant="ghost"
+                    onClick={() => setShowAllAdvertisers(true)}
+                  />
+                ))}
+              {value.advertiserIsCustom ? (
+                <ChipInput
+                  value={value.advertiser}
+                  onChange={(e) => onChange({ advertiser: e.target.value })}
+                />
+              ) : (
+                <Chip
+                  label="직접 입력"
+                  variant="ghost"
+                  onClick={() => onChange({ advertiser: '', advertiserIsCustom: true })}
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>
