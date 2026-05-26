@@ -247,18 +247,19 @@
   border-style: solid;
 }
 
-/* 일정 카드 — 좌측: 날짜 두 개(짧게) / 우측: 빠른 선택 칩 한 줄.
-   날짜 인풋은 'YYYY-MM-DD' + 아이콘 들어갈 정도(180px)로 좁힘. */
+/* 일정 카드 — 좌측: 날짜 두 개(요일까지 보이게) / 우측: 빠른 선택 칩 한 줄.
+   좌측은 dates 자연 폭(auto), 우측 1fr이 빠른 선택을 한 줄로 펼침.
+   인풋 폭 220px: '2026-05-26 (화)' + 캘린더 아이콘 + padding 여유. */
 .deadlineSplit {
   display: grid;
-  grid-template-columns: minmax(0, 400px) 1fr;
+  grid-template-columns: auto 1fr;
   gap: 32px;
   align-items: start;
 }
 
 .deadlineDates {
   display: grid;
-  grid-template-columns: minmax(0, 180px) minmax(0, 180px);
+  grid-template-columns: 220px 220px;
   gap: var(--space-field);
 }
 
