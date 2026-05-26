@@ -28,11 +28,10 @@
   font-weight: 500;
 }
 
-/* 와이드: 2열 그리드. 좁으면 1열로 자동 전환. */
+/* 1열 와이드 — 카드 하나에 넓은 폭을 줘서 칩이 한두 줄에 펼쳐지게. */
 .zones {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: start;            /* 카드가 row 높이에 끌려가지 않게 */
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 
@@ -44,11 +43,8 @@
   padding: 0 4px;
 }
 
-/* 좁은 화면 (태블릿 이하): 1열 + 버튼은 전체폭 */
-@media (max-width: 900px) {
-  .zones {
-    grid-template-columns: 1fr;
-  }
+/* 좁은 화면 (모바일): 버튼은 전체폭으로 폴백 */
+@media (max-width: 560px) {
   .footer {
     justify-content: stretch;
   }

@@ -34,10 +34,11 @@
   gap: var(--space-field);
 }
 
-/* 가로 두 칸 (모바일에선 한 줄씩) */
+/* 가로 두 칸 — 와이드 카드에서 인풋이 무한정 늘어나지 않게 최대폭 제한.
+   모바일에선 한 줄씩. */
 .row2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 320px) minmax(0, 320px);
   gap: var(--space-field);
 }
 
