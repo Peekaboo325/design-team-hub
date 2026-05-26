@@ -9,6 +9,7 @@ type Props = {
   value: string                    // YYYY-MM-DD ('' 가능)
   onChange: (next: string) => void
   holidays?: readonly string[]     // YYYY-MM-DD 배열
+  disabledBefore?: string          // YYYY-MM-DD. 이 날짜 이전(미포함)은 선택 불가
 }
 
 function ymd(d: Date): string {
@@ -27,7 +28,7 @@ function parseYmd(s: string): Date | undefined {
 
 // 토스 톤 캘린더 — react-day-picker v9 + 한국어 locale.
 // 토(파랑) / 일(빨강) / 공휴일(빨강·굵게) 색칠.
-export function DatePicker({ label, value, onChange, holidays = [] }: Props) {
+export function DatePicker({ label, value, onChange, holidays = [], disabledBefore }: Props) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -45,6 +46,7 @@ export function DatePicker({ label, value, onChange, holidays = [] }: Props) {
 
   const selected = parseYmd(value)
   const holidaySet = new Set(holidays)
+  const disabledBeforeDate = disabledBefore ? parseYmd(disabledBefore) : undefined
 
   const triggerCls = [styles.trigger, open ? styles.open : ''].filter(Boolean).join(' ')
 
@@ -71,6 +73,7 @@ export function DatePicker({ label, value, onChange, holidays = [] }: Props) {
             }}
             locale={ko}
             weekStartsOn={1}
+            disabled={disabledBeforeDate ? { before: disabledBeforeDate } : undefined}
             modifiers={{
               saturday: (date: Date) => date.getDay() === 6,
               sunday: (date: Date) => date.getDay() === 0,

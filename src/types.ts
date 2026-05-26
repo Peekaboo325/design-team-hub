@@ -81,16 +81,10 @@ function rollToNextBusinessDay(d: Date, holidays: readonly string[]): void {
   }
 }
 
-// 당일이지만 영업일이 아니면(주말·공휴일) 그다음 영업일
-export function todayBusinessDay(holidays: readonly string[] = []): string {
-  const d = new Date()
-  rollToNextBusinessDay(d, holidays)
-  return ymd(d)
-}
-
 // 기준일에서 N영업일 뒤 (기준일 비어있으면 오늘 기준).
 // 기준일이 비영업일이면 먼저 다음 영업일로 굴린 후 N영업일 추가.
 // 추가 중 만나는 토/일/공휴일은 카운트하지 않고 건너뜀.
+// days=0이면 기준일을 영업일로 정규화만 반환.
 export function addBusinessDays(
   baseDate: string,
   days: number,
@@ -106,6 +100,15 @@ export function addBusinessDays(
     }
   }
   return ymd(d)
+}
+
+// 한글 요일 표기 — YYYY-MM-DD → '월'~'일' 한 글자
+const WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'] as const
+export function weekdayKo(ymdStr: string): string {
+  if (!ymdStr) return ''
+  const [y, m, day] = ymdStr.split('-').map(Number)
+  if (!y || !m || !day) return ''
+  return WEEKDAY_KO[new Date(y, m - 1, day).getDay()]
 }
 
 export const INITIAL_FORM_STATE: FormState = {
