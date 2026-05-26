@@ -32,7 +32,7 @@ export type FormState = {
 }
 
 export const EMPTY_WORK_ROW: WorkRow = {
-  channel: null,
+  channel: 'online',   // 기본 온라인 — 카드 열자마자 종류 칩이 보이게
   category: '',
   level: '',
   quantity: '',

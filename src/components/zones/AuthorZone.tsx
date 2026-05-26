@@ -31,8 +31,8 @@ export function AuthorZone({ value, onChange }: Props) {
   return (
     <section className={styles.card}>
       <header className={styles.header}>
-        <h2 className={styles.title}>작성자</h2>
-        <p className={styles.subtitle}>메일 정보 · 광고주 · 팀 · 요청자(AE). 외부 팀은 직접 입력.</p>
+        <h2 className={styles.title}>기본 정보</h2>
+        <p className={styles.subtitle}>메일 · 광고주 · 팀 · 요청자(AE). 외부 팀은 직접 입력.</p>
       </header>
 
       <div className={styles.body}>

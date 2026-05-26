@@ -16,6 +16,14 @@ export function WorkZone({ value, onChange }: Props) {
     onChange({ work: { ...work, ...patch } })
   }
 
+  // 온/오프 토글 — 칩 한 번 누르면 반대편으로 전환. 종류·난이도는 채널 바뀌면 리셋.
+  const toggleChannel = () => {
+    const next: Channel = work.channel === 'offline' ? 'online' : 'offline'
+    updateWork({ channel: next, category: '', level: '' })
+  }
+
+  const channelLabel = work.channel === 'offline' ? '오프라인' : '온라인'
+
   const categories = work.channel ? Object.keys(WORK_TYPES[work.channel]) : []
   const levels =
     work.channel && work.category
@@ -25,25 +33,22 @@ export function WorkZone({ value, onChange }: Props) {
   return (
     <section className={styles.card}>
       <header className={styles.header}>
-        <h2 className={styles.title}>작업</h2>
+        <h2 className={styles.title}>작업 정보</h2>
         <p className={styles.subtitle}>
           온/오프 → 종류 → 난이도 순으로 선택. 소재가 여러 개면 다음 단계에서 [+] 복제 예정.
         </p>
       </header>
 
       <div className={styles.body}>
-        {/* 온/오프 */}
+        {/* 온/오프 — 단일 토글 칩. 클릭하면 반대편으로 전환. */}
         <div>
           <span className={styles.fieldLabel}>온/오프</span>
           <div className={styles.chips}>
-            {(['online', 'offline'] as Channel[]).map((c) => (
-              <Chip
-                key={c}
-                label={c === 'online' ? '온라인' : '오프라인'}
-                selected={work.channel === c}
-                onClick={() => updateWork({ channel: c, category: '', level: '' })}
-              />
-            ))}
+            <Chip
+              label={`${channelLabel} ↔`}
+              selected
+              onClick={toggleChannel}
+            />
           </div>
         </div>
 
