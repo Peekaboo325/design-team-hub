@@ -16,9 +16,9 @@ export function EditorForm() {
   return (
     <div className={styles.page}>
       <header className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>작업 등록</h1>
+        <h1 className={styles.pageTitle}>스케줄 등록</h1>
         <p className={styles.pageDesc}>
-          시트에 새 작업 한 건을 등록합니다. (1단계 — 아직 시트에 쓰이지 않음)
+          새 스케줄 한 건을 등록합니다. (1단계 — 아직 시트에 쓰이지 않음)
         </p>
       </header>
 
@@ -35,7 +35,6 @@ export function EditorForm() {
         </Button>
         <Button
           variant="primary"
-          fullWidth
           onClick={() => {
             // 1단계 — 등록 동작 없음. 다음 단계(미리보기)에서 채움.
             console.log('FORM STATE:', form)
