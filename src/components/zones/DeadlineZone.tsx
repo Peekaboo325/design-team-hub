@@ -42,6 +42,7 @@ export function DeadlineZone({ value, onChange }: Props) {
             onChange={(d) => onChange({ deadline: d })}
             holidays={HOLIDAYS}
             disabledBefore={value.requestDate}
+            placeholder="YYYY-MM-DD"
           />
         </div>
 

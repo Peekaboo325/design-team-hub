@@ -10,6 +10,7 @@ type Props = {
   onChange: (next: string) => void
   holidays?: readonly string[]     // YYYY-MM-DD 배열
   disabledBefore?: string          // YYYY-MM-DD. 이 날짜 이전(미포함)은 선택 불가
+  placeholder?: string             // 빈 값일 때 trigger에 표시할 회색 안내 텍스트
 }
 
 function ymd(d: Date): string {
@@ -28,7 +29,7 @@ function parseYmd(s: string): Date | undefined {
 
 // 토스 톤 캘린더 — react-day-picker v9 + 한국어 locale.
 // 일요일 시작(한국 캘린더 관습). 토(파랑) / 일·공휴일(빨강) 색칠.
-export function DatePicker({ label, value, onChange, holidays = [], disabledBefore }: Props) {
+export function DatePicker({ label, value, onChange, holidays = [], disabledBefore, placeholder }: Props) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -57,7 +58,13 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
         className={triggerCls}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className={styles.triggerText}>{value || ' '}</span>
+        <span
+          className={[styles.triggerText, !value && placeholder ? styles.triggerPlaceholder : '']
+            .filter(Boolean)
+            .join(' ')}
+        >
+          {value || placeholder || ' '}
+        </span>
         <CalendarIcon />
       </button>
       {open && (
