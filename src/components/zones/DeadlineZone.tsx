@@ -26,9 +26,6 @@ export function DeadlineZone({ value, onChange }: Props) {
     <section className={styles.card}>
       <header className={styles.header}>
         <h2 className={styles.title}>일정 정보</h2>
-        <p className={styles.subtitle}>
-          접수일은 기본 오늘. 마감일은 캘린더에서 직접 고르거나 우측 빠른 선택(접수일 기준, 영업일).
-        </p>
       </header>
 
       <div className={styles.deadlineSplit}>

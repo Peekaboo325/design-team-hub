@@ -33,9 +33,6 @@ export function WorkZone({ value, onChange }: Props) {
     <section className={styles.card}>
       <header className={styles.header}>
         <h2 className={styles.title}>작업 정보</h2>
-        <p className={styles.subtitle}>
-          종류 → 상세 → 소재(수량·비고) 순. 한 메일에 여러 종류가 섞이면 아래 [+ 다른 종류 추가].
-        </p>
       </header>
 
       <div className={styles.body}>
