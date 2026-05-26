@@ -140,3 +140,31 @@
   pointer-events: none;
 }
 
+/* 월간 네비 화살표 (<, >) — v10이 SVG의 fill을 currentColor로 그리는데
+   .popover 컨텍스트에서 색이 안 박힐 때를 대비해 wide net으로 강제. */
+.popover :global(.rdp-nav) button,
+.popover :global(.rdp-button_previous),
+.popover :global(.rdp-button_next) {
+  color: var(--color-text) !important;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background-color 0.15s ease;
+}
+
+.popover :global(.rdp-nav) button:hover:not(:disabled),
+.popover :global(.rdp-button_previous):hover:not(:disabled),
+.popover :global(.rdp-button_next):hover:not(:disabled) {
+  background: #F2F4F6 !important;
+}
+
+.popover :global(.rdp-chevron),
+.popover :global(.rdp-nav svg),
+.popover :global(.rdp-button_previous svg),
+.popover :global(.rdp-button_next svg) {
+  fill: var(--color-text) !important;
+  color: var(--color-text) !important;
+}
+

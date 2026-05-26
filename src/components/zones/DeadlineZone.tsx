@@ -49,13 +49,16 @@ export function DeadlineZone({ value, onChange }: Props) {
           <span className={styles.fieldLabel}>마감일 빠른 선택</span>
           <div className={styles.chips}>
             {QUICK_OPTIONS.map((opt) => {
-              // 각 칩이 실제로 어떤 날짜·요일로 떨어질지 미리 계산해서 라벨에 노출
+              // 각 칩이 실제로 어떤 날짜·요일로 떨어질지 미리 계산해서 라벨에 노출.
+              // 사용자가 캘린더로 직접 마감일을 골랐어도, 그게 어떤 빠른 선택과
+              // 일치하면 해당 칩에 자동 selected 표시 → 어느 옵션과 같은 날인지 즉시 인식.
               const target = addBusinessDays(value.requestDate, opt.days, HOLIDAYS)
               const day = weekdayKo(target)
               return (
                 <Chip
                   key={opt.label}
                   label={`${opt.label}(${day})`}
+                  selected={value.deadline === target}
                   className={styles.quickChip}
                   onClick={() => onChange({ deadline: target })}
                 />
