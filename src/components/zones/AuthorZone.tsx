@@ -48,33 +48,6 @@ export function AuthorZone({ value, onChange }: Props) {
           />
         </div>
 
-        {/* 광고주 — 칩 + 직접 입력 (인라인) */}
-        <div>
-          <span className={styles.fieldLabel}>광고주</span>
-          <div className={styles.chips}>
-            {sortedAdvertisers.map((name) => (
-              <Chip
-                key={name}
-                label={name}
-                selected={!value.advertiserIsCustom && value.advertiser === name}
-                onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
-              />
-            ))}
-            {value.advertiserIsCustom ? (
-              <ChipInput
-                value={value.advertiser}
-                onChange={(e) => onChange({ advertiser: e.target.value })}
-              />
-            ) : (
-              <Chip
-                label="직접 입력"
-                variant="ghost"
-                onClick={() => onChange({ advertiser: '', advertiserIsCustom: true })}
-              />
-            )}
-          </div>
-        </div>
-
         {/* 팀 — 1팀/2팀 칩 + 직접 입력 (인라인) */}
         <div>
           <span className={styles.fieldLabel}>팀</span>
@@ -106,9 +79,10 @@ export function AuthorZone({ value, onChange }: Props) {
           </div>
         </div>
 
-        {/* 요청자 — 팀 따라 후보 또는 직접 입력 (인라인) */}
+        {/* 요청자 — 팀 따라 후보 또는 직접 입력 (인라인).
+            팀 미선택이면 '팀을 먼저 선택해주세요' 비활성 칩으로 영역 유지 (덜컹거림 방지). */}
         <div>
-          <span className={styles.fieldLabel}>요청자(AE)</span>
+          <span className={styles.fieldLabel}>요청자(기획자)</span>
           {value.teamIsCustom ? (
             <div className={styles.chips}>
               <ChipInput
@@ -140,8 +114,37 @@ export function AuthorZone({ value, onChange }: Props) {
               )}
             </div>
           ) : (
-            <p className={styles.subtitle}>팀을 먼저 선택해주세요.</p>
+            <div className={styles.chips}>
+              <Chip label="팀을 먼저 선택해주세요" variant="ghost" disabled />
+            </div>
           )}
+        </div>
+
+        {/* 광고주 — 칩 + 직접 입력 (인라인) */}
+        <div>
+          <span className={styles.fieldLabel}>광고주</span>
+          <div className={styles.chips}>
+            {sortedAdvertisers.map((name) => (
+              <Chip
+                key={name}
+                label={name}
+                selected={!value.advertiserIsCustom && value.advertiser === name}
+                onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
+              />
+            ))}
+            {value.advertiserIsCustom ? (
+              <ChipInput
+                value={value.advertiser}
+                onChange={(e) => onChange({ advertiser: e.target.value })}
+              />
+            ) : (
+              <Chip
+                label="직접 입력"
+                variant="ghost"
+                onClick={() => onChange({ advertiser: '', advertiserIsCustom: true })}
+              />
+            )}
+          </div>
         </div>
       </div>
     </section>

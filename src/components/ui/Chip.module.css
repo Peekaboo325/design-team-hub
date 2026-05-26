@@ -45,3 +45,16 @@
   border-color: var(--color-primary);
   border-style: solid;
 }
+
+/* 비활성 — placeholder 안내 칩 등. 흐리고 클릭 불가. */
+.chip:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.chip:disabled:hover {
+  background: #F2F4F6;
+}
+.chip.ghost:disabled:hover {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
