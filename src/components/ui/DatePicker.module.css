@@ -89,28 +89,39 @@
   text-transform: none;
 }
 
-/* 토 = 파랑 / 일 = 빨강 / 공휴일 = 빨강·굵게 (한국 캘린더 관습) */
+/* 토 = 파랑 / 일 = 빨강 / 공휴일 = 빨강·굵게 (한국 캘린더 관습).
+   v10 기본 색상을 확실히 이기게 !important. */
 .saturday {
-  color: #3B82F6;
+  color: #3B82F6 !important;
 }
 .sunday {
-  color: #DC2626;
+  color: #DC2626 !important;
 }
 .holiday {
-  color: #DC2626;
+  color: #DC2626 !important;
   font-weight: 700;
 }
 
-/* 오늘 — 토스 블루 채운 원 + 흰 글자. 주말·공휴일·선택 색상보다 우선. */
+/* 오늘 — 토스 블루 채운 원 + 흰 글자 */
 .todayCircle {
   background: var(--color-primary) !important;
   color: #fff !important;
-  border-radius: 50%;
+  border-radius: 50% !important;
   font-weight: 700;
 }
 
-/* 선택된 날 — 토/일/공휴일 색상보다 우선해서 흰 글자 보장
-   (v9의 .rdp-selected는 day_button에 직접 붙음 → 같은 element 클래스 결합) */
-.popover :global(.rdp-day_button.rdp-selected) {
+/* 선택된 날 — 토스 블루 채운 원 + 흰 글자 (today와 같은 톤; 오늘이면서 선택돼도 같은 모습) */
+.selectedCircle {
+  background: var(--color-primary) !important;
   color: #fff !important;
+  border-radius: 50% !important;
+  font-weight: 700;
 }
+
+/* 비활성(접수일 이전) 날 — 흐리게 + 클릭 불가 */
+.popover button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+

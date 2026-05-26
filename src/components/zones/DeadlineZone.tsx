@@ -18,6 +18,7 @@ const QUICK_OPTIONS: { label: string; days: number }[] = [
   { label: '+2일', days: 2 },
   { label: '+3일', days: 3 },
   { label: '+4일', days: 4 },
+  { label: '+5일', days: 5 },
 ]
 
 export function DeadlineZone({ value, onChange }: Props) {
