@@ -51,6 +51,18 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* 탈강조 — 클릭은 가능하지만 시각적으로 흐림 (요청자별 추천 외 광고주 등).
+   선택 상태이면 muted 무시 (selected가 우선). */
+.chip.muted {
+  opacity: 0.35;
+}
+.chip.muted:hover {
+  opacity: 0.6;
+}
+.chip.selected.muted {
+  opacity: 1;
+}
 .chip:disabled:hover {
   background: #F2F4F6;
 }

@@ -8,15 +8,26 @@ type Props = {
   variant?: 'default' | 'ghost'
   // 비활성 (placeholder 안내 칩 등) — 흐림 + 클릭 불가
   disabled?: boolean
+  // 탈강조 — 클릭은 가능하지만 시각적으로 흐림 (요청자별 추천 외 광고주 등)
+  muted?: boolean
   // 외부에서 추가 클래스 결합 (예: 균일 폭, 정렬 등)
   className?: string
 }
 
-export function Chip({ label, selected, onClick, variant = 'default', disabled, className }: Props) {
+export function Chip({
+  label,
+  selected,
+  onClick,
+  variant = 'default',
+  disabled,
+  muted,
+  className,
+}: Props) {
   const cls = [
     styles.chip,
     selected ? styles.selected : '',
     variant === 'ghost' ? styles.ghost : '',
+    muted ? styles.muted : '',
     className ?? '',
   ]
     .filter(Boolean)

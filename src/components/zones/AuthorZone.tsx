@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import type { FormState } from '../../types'
-import { ADVERTISERS, ADVERTISERS_BY_TEAM, TEAMS, REQUESTERS } from '../../data/team'
+import {
+  ADVERTISERS,
+  ADVERTISERS_BY_TEAM,
+  TEAMS,
+  REQUESTERS,
+  REQUESTER_DEFAULT_ADVERTISERS,
+} from '../../data/team'
 import { Chip } from '../ui/Chip'
 import { ChipInput } from '../ui/ChipInput'
 import { TextInput } from '../ui/TextInput'
@@ -53,6 +59,14 @@ export function AuthorZone({ value, onChange }: Props) {
     }
   }
   const showAdvertiserMore = isInternalTeam && restAdvertisers.length > 0
+
+  // 요청자별 담당 광고주 — 선택된 요청자가 있고 매핑이 비어있지 않을 때만 강조 효과 발동.
+  // 매핑된 광고주는 진하게(normal), 그 외 광고주는 흐리게(muted).
+  const requesterDefaults: readonly string[] =
+    !value.requesterIsCustom && value.requester
+      ? REQUESTER_DEFAULT_ADVERTISERS[value.requester] ?? []
+      : []
+  const hasEmphasis = requesterDefaults.length > 0
 
   return (
     <section className={styles.card}>
@@ -163,6 +177,7 @@ export function AuthorZone({ value, onChange }: Props) {
                   key={name}
                   label={name}
                   selected={!value.advertiserIsCustom && value.advertiser === name}
+                  muted={hasEmphasis && !requesterDefaults.includes(name)}
                   onClick={() => onChange({ advertiser: name, advertiserIsCustom: false })}
                 />
               ))}
