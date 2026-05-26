@@ -1,0 +1,68 @@
+/* SUIT 폰트 — variable 버전 */
+@import url('https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css');
+
+/* 토스 톤 디자인 토큰 */
+:root {
+  /* 컬러 */
+  --color-primary: #3182F6;
+  --color-primary-hover: #1B64DA;
+  --color-primary-soft: #E8F2FE;
+
+  --color-bg: #F2F4F6;
+  --color-card: #FFFFFF;
+
+  --color-text: #191F28;
+  --color-text-secondary: #4E5968;
+  --color-text-tertiary: #8B95A1;
+
+  --color-border: #E5E8EB;
+  --color-border-strong: #D1D6DB;
+
+  --color-danger: #F04452;
+
+  /* 라운드 */
+  --radius-card: 16px;
+  --radius-input: 12px;
+  --radius-chip: 999px;
+  --radius-button: 12px;
+
+  /* 여백 */
+  --space-card: 28px;
+  --space-section: 24px;
+  --space-field: 16px;
+  --space-tight: 8px;
+
+  /* 타이포 */
+  --font-family: 'SUIT Variable', 'SUIT', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --fs-h1: 28px;
+  --fs-h2: 20px;
+  --fs-body: 16px;
+  --fs-label: 14px;
+  --fs-caption: 13px;
+
+  /* 그림자 */
+  --shadow-card: 0 1px 3px rgba(25, 31, 40, 0.04);
+}
+
+/* reset (가볍게) */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  font-size: var(--fs-body);
+  font-weight: 500;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3, h4, p { margin: 0; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; padding: 0; color: inherit; }
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+ul { list-style: none; padding: 0; margin: 0; }

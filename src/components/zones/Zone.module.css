@@ -1,0 +1,63 @@
+/* 네 존이 공유하는 카드 스타일 */
+.card {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  padding: var(--space-card);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: var(--fs-caption);
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-field);
+}
+
+/* 가로 두 칸 (모바일에선 한 줄씩) */
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-field);
+}
+
+@media (max-width: 560px) {
+  .row2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 칩 묶음 (광고주, 팀, 디자이너 등 후보 나열) */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
