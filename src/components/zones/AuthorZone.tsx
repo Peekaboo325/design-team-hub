@@ -1,6 +1,7 @@
 import type { FormState } from '../../types'
 import { ADVERTISERS, TEAMS, REQUESTERS } from '../../data/team'
 import { Chip } from '../ui/Chip'
+import { ChipInput } from '../ui/ChipInput'
 import { TextInput } from '../ui/TextInput'
 import styles from './Zone.module.css'
 
@@ -67,7 +68,7 @@ export function AuthorZone({ value, onChange }: Props) {
           </div>
         </div>
 
-        {/* 팀 — 1팀/2팀 칩 + 직접 입력 */}
+        {/* 팀 — 1팀/2팀 칩 + 직접 입력 (칩 자리에서 인라인 입력) */}
         <div>
           <span className={styles.fieldLabel}>팀</span>
           <div className={styles.chips}>
@@ -81,63 +82,60 @@ export function AuthorZone({ value, onChange }: Props) {
                 }
               />
             ))}
-            <Chip
-              label={value.teamIsCustom ? '직접 입력 중' : '직접 입력'}
-              variant="ghost"
-              selected={value.teamIsCustom}
-              onClick={() =>
-                onChange({ team: '', teamIsCustom: true, requester: '', requesterIsCustom: true })
-              }
-            />
-          </div>
-          {value.teamIsCustom && (
-            <div style={{ marginTop: 12 }}>
-              <TextInput
-                placeholder="예: 4본부 마케팅팀"
+            {value.teamIsCustom ? (
+              <ChipInput
+                placeholder="팀 이름"
                 value={value.team}
                 onChange={(e) => onChange({ team: e.target.value })}
               />
-            </div>
-          )}
+            ) : (
+              <Chip
+                label="직접 입력"
+                variant="ghost"
+                onClick={() =>
+                  onChange({ team: '', teamIsCustom: true, requester: '', requesterIsCustom: true })
+                }
+              />
+            )}
+          </div>
         </div>
 
-        {/* 요청자 — 팀 따라 후보 또는 직접 입력 */}
+        {/* 요청자 — 팀 따라 후보 또는 직접 입력 (인라인) */}
         <div>
           <span className={styles.fieldLabel}>요청자(AE)</span>
           {value.teamIsCustom ? (
-            <TextInput
-              placeholder="외부 팀 요청자 이름"
-              value={value.requester}
-              onChange={(e) => onChange({ requester: e.target.value })}
-            />
+            // 외부 팀이면 요청자도 자동으로 직접 입력 모드 (후보 없음)
+            <div className={styles.chips}>
+              <ChipInput
+                placeholder="요청자 이름"
+                value={value.requester}
+                onChange={(e) => onChange({ requester: e.target.value })}
+              />
+            </div>
           ) : requesterCandidates.length > 0 ? (
-            <>
-              <div className={styles.chips}>
-                {requesterCandidates.map((name) => (
-                  <Chip
-                    key={name}
-                    label={name}
-                    selected={!value.requesterIsCustom && value.requester === name}
-                    onClick={() => onChange({ requester: name, requesterIsCustom: false })}
-                  />
-                ))}
+            <div className={styles.chips}>
+              {requesterCandidates.map((name) => (
                 <Chip
-                  label={value.requesterIsCustom ? '직접 입력 중' : '직접 입력'}
+                  key={name}
+                  label={name}
+                  selected={!value.requesterIsCustom && value.requester === name}
+                  onClick={() => onChange({ requester: name, requesterIsCustom: false })}
+                />
+              ))}
+              {value.requesterIsCustom ? (
+                <ChipInput
+                  placeholder="요청자 이름"
+                  value={value.requester}
+                  onChange={(e) => onChange({ requester: e.target.value })}
+                />
+              ) : (
+                <Chip
+                  label="직접 입력"
                   variant="ghost"
-                  selected={value.requesterIsCustom}
                   onClick={() => onChange({ requester: '', requesterIsCustom: true })}
                 />
-              </div>
-              {value.requesterIsCustom && (
-                <div style={{ marginTop: 12 }}>
-                  <TextInput
-                    placeholder="요청자 이름"
-                    value={value.requester}
-                    onChange={(e) => onChange({ requester: e.target.value })}
-                  />
-                </div>
               )}
-            </>
+            </div>
           ) : (
             <p className={styles.subtitle}>팀을 먼저 선택해주세요.</p>
           )}
