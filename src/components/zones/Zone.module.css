@@ -141,6 +141,29 @@
   }
 }
 
+/* 모바일 — 한 줄에 4컬럼은 너무 좁아 깨짐. 2줄 grid-areas로 분리.
+   1줄: 수량(좁게) | 작업 내용(나머지)
+   2줄: 디자이너(전체폭) | 액션
+   헤더 라벨은 숨김 (인풋 크기와 카드 컨텍스트로 식별 가능). */
+@media (max-width: 560px) {
+  .materialsHeader {
+    display: none;
+  }
+  .materialRow {
+    grid-template-columns: 70px 1fr auto;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "qty note note"
+      "designer designer actions";
+    gap: 8px;
+    align-items: center;
+  }
+  .materialRow > :nth-child(1) { grid-area: qty; }
+  .materialRow > :nth-child(2) { grid-area: note; }
+  .materialRow > :nth-child(3) { grid-area: designer; }
+  .materialRow > :nth-child(4) { grid-area: actions; }
+}
+
 /* ───── 종류 그룹 (한 메일에 여러 종류가 섞일 때) ───── */
 
 /* 모든 그룹의 공통 내부 레이아웃 — 종류·상세·소재 사이 간격 */
@@ -155,6 +178,15 @@
   border: 1.5px solid var(--color-border);
   border-radius: 14px;
   padding: 20px;
+}
+
+@media (max-width: 560px) {
+  .card {
+    padding: 20px;
+  }
+  .groupBox {
+    padding: 14px;
+  }
 }
 
 .groupHeader {
