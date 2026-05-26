@@ -75,11 +75,20 @@ export function DatePicker({ label, value, onChange, holidays = [] }: Props) {
               saturday: (date: Date) => date.getDay() === 6,
               sunday: (date: Date) => date.getDay() === 0,
               holiday: (date: Date) => holidaySet.has(ymd(date)),
+              isToday: (date: Date) => {
+                const t = new Date()
+                return (
+                  date.getFullYear() === t.getFullYear() &&
+                  date.getMonth() === t.getMonth() &&
+                  date.getDate() === t.getDate()
+                )
+              },
             }}
             modifiersClassNames={{
               saturday: styles.saturday,
               sunday: styles.sunday,
               holiday: styles.holiday,
+              isToday: styles.todayCircle,
             }}
           />
         </div>

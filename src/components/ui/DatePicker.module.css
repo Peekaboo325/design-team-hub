@@ -90,6 +90,14 @@
   font-weight: 700;
 }
 
+/* 오늘 — 토스 블루 채운 원 + 흰 글자. 주말·공휴일·선택 색상보다 우선. */
+.todayCircle {
+  background: var(--color-primary) !important;
+  color: #fff !important;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
 /* 선택된 날은 색상 무관 흰 글자가 보이게 */
 .popover :global(.rdp-selected) .saturday,
 .popover :global(.rdp-selected) .sunday,
