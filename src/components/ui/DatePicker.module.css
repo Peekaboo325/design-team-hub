@@ -102,20 +102,35 @@
   font-weight: 700;
 }
 
-/* 오늘 — 토스 블루 채운 원 + 흰 글자 */
-.todayCircle {
-  background: var(--color-primary) !important;
-  color: #fff !important;
-  border-radius: 50% !important;
-  font-weight: 700;
+/* 오늘 — 강조 X. v10 기본 today 시각(원형 표시 등)을 평범하게 무력화. */
+.todayPlain {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
 }
 
-/* 선택된 날 — 토스 블루 채운 원 + 흰 글자 (today와 같은 톤; 오늘이면서 선택돼도 같은 모습) */
-.selectedCircle {
-  background: var(--color-primary) !important;
+/* 선택된 날 — 토스 블루 채운 원 + 흰 글자 */
+.selectedFilled {
+  background-color: var(--color-primary) !important;
   color: #fff !important;
   border-radius: 50% !important;
-  font-weight: 700;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+/* 백업 — v10이 'selected' 클래스명 매핑 외에 다른 속성/클래스를 쓰는 경우 대비.
+   가능한 셀렉터에 모두 같은 스타일을 강제. */
+.popover :global(.rdp-day_button[aria-selected='true']),
+.popover :global([data-selected='true']),
+.popover :global([data-selected-single='true']) {
+  background-color: var(--color-primary) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-weight: 700 !important;
 }
 
 /* 비활성(접수일 이전) 날 — 흐리게 + 클릭 불가 */

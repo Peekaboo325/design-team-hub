@@ -47,12 +47,6 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
   const holidaySet = new Set(holidays)
   const disabledBeforeDate = disabledBefore ? parseYmd(disabledBefore) : undefined
 
-  // 같은 날짜 비교 (시간 무관)
-  const isSameDay = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-
   const triggerCls = [styles.trigger, open ? styles.open : ''].filter(Boolean).join(' ')
 
   return (
@@ -84,16 +78,13 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
               saturday: (date: Date) => date.getDay() === 6,
               sunday: (date: Date) => date.getDay() === 0,
               holiday: (date: Date) => holidaySet.has(ymd(date)),
-              isToday: (date: Date) => isSameDay(date, new Date()),
-              // 선택된 날을 자체 modifier로 명시 처리 (v10 기본 selected 시각화에 의존하지 않음)
-              isSelected: (date: Date) => (selected ? isSameDay(date, selected) : false),
             }}
             modifiersClassNames={{
               saturday: styles.saturday,
               sunday: styles.sunday,
               holiday: styles.holiday,
-              isToday: styles.todayCircle,
-              isSelected: styles.selectedCircle,
+              today: styles.todayPlain,        // 사용자 요청: 오늘 강조 X
+              selected: styles.selectedFilled, // 선택만 채운 파란 원으로
             }}
           />
         </div>
