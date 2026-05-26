@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { ko } from 'date-fns/locale'
 import 'react-day-picker/style.css'
+import { weekdayKo } from '../../types'
 import styles from './DatePicker.module.css'
 
 type Props = {
@@ -63,7 +64,7 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
             .filter(Boolean)
             .join(' ')}
         >
-          {value || placeholder || ' '}
+          {value ? `${value} (${weekdayKo(value)})` : placeholder || ' '}
         </span>
         <CalendarIcon />
       </button>
