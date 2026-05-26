@@ -113,6 +113,20 @@ export function weekdayKo(ymdStr: string): string {
   return WEEKDAY_KO[new Date(y, m - 1, day).getDay()]
 }
 
+// 작업 내용 끝의 숫자만 +1로 증가. 0 padding 유지.
+// 끝이 ')' 같은 비숫자면 매칭 안 되어 원본 그대로 반환.
+//   '메타01'              → '메타02'
+//   '메타09'              → '메타10'
+//   '메타01(1080x1080)'   → '메타01(1080x1080)' (끝이 닫는 괄호라 매칭 X)
+//   '메타01(260601)'      → '메타01(260601)'
+export function incrementTrailingNumber(s: string): string {
+  const match = s.match(/^(.*?)(\d+)$/)
+  if (!match) return s
+  const [, prefix, numStr] = match
+  const next = String(parseInt(numStr, 10) + 1).padStart(numStr.length, '0')
+  return prefix + next
+}
+
 export const INITIAL_FORM_STATE: FormState = {
   mailTitle: '',
   mailNote: '',

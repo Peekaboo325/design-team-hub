@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Group, Material } from '../../types'
+import { incrementTrailingNumber } from '../../types'
 import { WORK_TYPES, ONLINE_DEFAULT_CATEGORIES, DESIGNERS, type Channel } from '../../data/team'
 import { Chip } from '../ui/Chip'
 import { TextInput } from '../ui/TextInput'
@@ -53,7 +54,9 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
   }
 
   const cloneMaterial = (idx: number) => {
-    const cloned = { ...value.materials[idx] }
+    // 복제 시 작업 내용 끝의 숫자가 있으면 +1 자동 증가 (예: 메타01 → 메타02)
+    const src = value.materials[idx]
+    const cloned: Material = { ...src, note: incrementTrailingNumber(src.note) }
     const next = [...value.materials]
     next.splice(idx + 1, 0, cloned)
     onChange({ materials: next })
