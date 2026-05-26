@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import type { Group, Material } from '../../types'
-import { WORK_TYPES, ONLINE_DEFAULT_CATEGORIES, type Channel } from '../../data/team'
+import { WORK_TYPES, ONLINE_DEFAULT_CATEGORIES, DESIGNERS, type Channel } from '../../data/team'
 import { Chip } from '../ui/Chip'
 import { TextInput } from '../ui/TextInput'
+import { Dropdown } from '../ui/Dropdown'
 import styles from './Zone.module.css'
 
 type Props = {
@@ -131,11 +132,12 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
         </div>
       )}
 
-      {/* 소재 N개 */}
+      {/* 소재 N개 — 한 줄: 수량 / 작업 내용 / 디자이너 / 액션 */}
       <div className={styles.materialsBlock}>
         <div className={styles.materialsHeader}>
           <span className={styles.fieldLabel} style={{ marginBottom: 0 }}>수량</span>
-          <span className={styles.fieldLabel} style={{ marginBottom: 0 }}>비고</span>
+          <span className={styles.fieldLabel} style={{ marginBottom: 0 }}>작업 내용</span>
+          <span className={styles.fieldLabel} style={{ marginBottom: 0 }}>디자이너</span>
           <span />
         </div>
         {value.materials.map((mat, idx) => (
@@ -150,6 +152,13 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
             <TextInput
               value={mat.note}
               onChange={(e) => updateMaterial(idx, { note: e.target.value })}
+            />
+            <Dropdown
+              value={mat.designer}
+              options={DESIGNERS}
+              onChange={(v) => updateMaterial(idx, { designer: v })}
+              emptyLabel="미배정"
+              ariaLabel="담당 디자이너"
             />
             <div className={styles.materialActions}>
               <button

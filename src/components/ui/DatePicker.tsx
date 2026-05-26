@@ -27,12 +27,11 @@ function parseYmd(s: string): Date | undefined {
 }
 
 // 토스 톤 캘린더 — react-day-picker v9 + 한국어 locale.
-// 토(파랑) / 일(빨강) / 공휴일(빨강·굵게) 색칠.
+// 일요일 시작(한국 캘린더 관습). 토(파랑) / 일·공휴일(빨강) 색칠.
 export function DatePicker({ label, value, onChange, holidays = [], disabledBefore }: Props) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // 외부 클릭 시 닫기
   useEffect(() => {
     if (!open) return
     const handler = (e: MouseEvent) => {
@@ -58,7 +57,8 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
         className={triggerCls}
         onClick={() => setOpen((o) => !o)}
       >
-        {value || ' '}
+        <span className={styles.triggerText}>{value || ' '}</span>
+        <CalendarIcon />
       </button>
       {open && (
         <div className={styles.popover}>
@@ -72,7 +72,7 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
               }
             }}
             locale={ko}
-            weekStartsOn={1}
+            weekStartsOn={0}
             disabled={disabledBeforeDate ? { before: disabledBeforeDate } : undefined}
             modifiers={{
               saturday: (date: Date) => date.getDay() === 6,
@@ -97,5 +97,27 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
         </div>
       )}
     </div>
+  )
+}
+
+// 달력 아이콘 — 인라인 SVG (의존성 X)
+function CalendarIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ color: 'var(--color-text-tertiary)', flexShrink: 0 }}
+    >
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
   )
 }

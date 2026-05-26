@@ -1,9 +1,10 @@
 import type { Channel } from './data/team'
 
-// 소재 한 줄 — 같은 종류·상세 안에서 수량/비고는 소재마다 다를 수 있음.
+// 소재 한 줄 — 같은 종류·상세 안에서 수량·작업내용·디자이너는 소재마다 다를 수 있음.
 export type Material = {
   quantity: string                // 수량 (텍스트로 보유, 등록 시 숫자 변환)
-  note: string                    // 비고 (이 소재만의 특이사항)
+  note: string                    // 작업 내용 (시트 컬럼명은 '비고')
+  designer: string                // 배정 디자이너 ('' = 미배정. 팀장이 나중 배정 가능)
 }
 
 // 종류 그룹 — 한 메일 안에 여러 종류가 섞일 수 있음 (예: 배너 3개 + KV 1개).
@@ -40,6 +41,7 @@ export type FormState = {
 export const EMPTY_MATERIAL: Material = {
   quantity: '1',                  // 대부분의 의뢰가 수량 1로 시작
   note: '',
+  designer: '',                   // 미배정 — 등록 후 팀장이 배정할 수도 있음
 }
 
 export const EMPTY_GROUP: Group = {

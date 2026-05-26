@@ -58,6 +58,7 @@ export function DeadlineZone({ value, onChange }: Props) {
                 <Chip
                   key={opt.label}
                   label={`${opt.label}(${day})`}
+                  className={styles.quickChip}
                   onClick={() => onChange({ deadline: target })}
                 />
               )

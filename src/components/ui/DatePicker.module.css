@@ -11,9 +11,13 @@
   color: var(--color-text-secondary);
 }
 
-/* 트리거 버튼 — TextInput과 동일 톤 */
+/* 트리거 버튼 — TextInput과 동일 톤 + 우측 달력 아이콘 */
 .trigger {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   padding: 14px 16px;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-input);
@@ -26,6 +30,13 @@
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s ease;
+}
+
+.triggerText {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .trigger:hover {
