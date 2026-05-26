@@ -1,4 +1,4 @@
-import { WORK_TYPES, type Channel } from './data/team'
+import { WORK_TYPES, type Channel, type ScheduleType } from './data/team'
 
 // 소재 한 줄 — 같은 종류·상세 안에서 수량·작업내용·디자이너는 소재마다 다를 수 있음.
 export type Material = {
@@ -32,6 +32,7 @@ export type FormState = {
   requesterIsCustom: boolean
 
   // 일정
+  scheduleType: ScheduleType      // 일반 / 급건 / 여유 (B열). 기본 '일반'
   requestDate: string             // YYYY-MM-DD (기본: 오늘)
   deadline: string                // YYYY-MM-DD
 
@@ -218,6 +219,7 @@ export const INITIAL_FORM_STATE: FormState = {
   teamIsCustom: false,
   requester: '',
   requesterIsCustom: false,
+  scheduleType: '일반',
   requestDate: today(),
   deadline: '',
   groups: [{ ...EMPTY_GROUP, materials: [{ ...EMPTY_MATERIAL }] }],

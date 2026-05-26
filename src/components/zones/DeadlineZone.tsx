@@ -1,6 +1,6 @@
 import type { FormState, Validation } from '../../types'
 import { addBusinessDays, weekdayKo } from '../../types'
-import { HOLIDAYS } from '../../data/team'
+import { HOLIDAYS, SCHEDULE_TYPES } from '../../data/team'
 import { DatePicker } from '../ui/DatePicker'
 import { Chip } from '../ui/Chip'
 import styles from './Zone.module.css'
@@ -31,6 +31,21 @@ export function DeadlineZone({ value, onChange, validation }: Props) {
           <span className={styles.titleCaption}>영업일 기반 계산</span>
         </h2>
       </header>
+
+      {/* 타입 — 의뢰 긴급도. 시트 B열에 박힘. */}
+      <div>
+        <span className={styles.fieldLabel}>타입</span>
+        <div className={styles.chips}>
+          {SCHEDULE_TYPES.map((t) => (
+            <Chip
+              key={t}
+              label={t}
+              selected={value.scheduleType === t}
+              onClick={() => onChange({ scheduleType: t })}
+            />
+          ))}
+        </div>
+      </div>
 
       <div className={styles.deadlineSplit}>
         <div className={styles.deadlineDates}>
