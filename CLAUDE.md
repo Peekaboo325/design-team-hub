@@ -2,6 +2,9 @@
 
 > **⚠ 시트 구조·컬럼·GAS URL 관련 작업은 루트의 [DATA_CONTRACT.md](./DATA_CONTRACT.md)를 먼저 확인할 것.**
 > 한 시트를 위젯·대시보드·입력기(예정)가 공유하므로, 한쪽 변경이 다른 쪽을 조용히 깨뜨릴 수 있다.
+>
+> **GAS 코드 동작·계약은 [docs/GAS_REFERENCE.md](./docs/GAS_REFERENCE.md) 참조.**
+> 원본은 위젯 레포에 있고, 이 레포에는 미러링 doc만. GAS 동작이 바뀌면 그 doc도 같이 갱신.
 
 ## 프로젝트 개요
 IMC 3본부 디자인팀 팀원용 바탕화면 위젯 (Electron + React + Vite)
