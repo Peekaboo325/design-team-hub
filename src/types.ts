@@ -113,18 +113,23 @@ export function weekdayKo(ymdStr: string): string {
   return WEEKDAY_KO[new Date(y, m - 1, day).getDay()]
 }
 
-// 작업 내용 끝의 숫자만 +1로 증가. 0 padding 유지.
-// 끝이 ')' 같은 비숫자면 매칭 안 되어 원본 그대로 반환.
+// 작업 내용의 숫자 +1로 증가. 0 padding 유지.
+// 대상: 문자열 끝 또는 닫는 괄호들 직전의 숫자.
+// 괄호 안 내용은 매칭 그룹에 안 들어가므로 절대 안 바뀜.
+//
 //   '메타01'              → '메타02'
 //   '메타09'              → '메타10'
-//   '메타01(1080x1080)'   → '메타01(1080x1080)' (끝이 닫는 괄호라 매칭 X)
-//   '메타01(260601)'      → '메타01(260601)'
+//   '메타01(1080x1080)'   → '메타02(1080x1080)'  (괄호 안은 그대로)
+//   '메타01(260601)'      → '메타02(260601)'
+//   '메타01(1080)(추가)'  → '메타02(1080)(추가)' (괄호 여러 개도 OK)
+//   '메타_시안'           → '메타_시안' (끝이 텍스트라 매칭 X)
+//   '01번째메타'          → '01번째메타' (숫자가 가운데, 끝이 텍스트)
 export function incrementTrailingNumber(s: string): string {
-  const match = s.match(/^(.*?)(\d+)$/)
+  const match = s.match(/^(.*?)(\d+)((?:\([^)]*\))*)$/)
   if (!match) return s
-  const [, prefix, numStr] = match
+  const [, prefix, numStr, trailing] = match
   const next = String(parseInt(numStr, 10) + 1).padStart(numStr.length, '0')
-  return prefix + next
+  return prefix + next + trailing
 }
 
 export const INITIAL_FORM_STATE: FormState = {
