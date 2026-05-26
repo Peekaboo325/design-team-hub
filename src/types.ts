@@ -1,10 +1,18 @@
 import type { Channel } from './data/team'
 
-// 소재 한 줄 — 수량과 비고는 소재마다 다를 수 있음.
-// 다른 작업 정보(채널·종류·상세)는 모든 소재가 공유.
+// 소재 한 줄 — 같은 종류·상세 안에서 수량/비고는 소재마다 다를 수 있음.
 export type Material = {
   quantity: string                // 수량 (텍스트로 보유, 등록 시 숫자 변환)
   note: string                    // 비고 (이 소재만의 특이사항)
+}
+
+// 종류 그룹 — 한 메일 안에 여러 종류가 섞일 수 있음 (예: 배너 3개 + KV 1개).
+// 한 그룹은 (채널·종류·상세) 공통 + 소재 N개.
+export type Group = {
+  channel: Channel | null
+  category: string                // 종류 (예: 'KV')
+  detail: string                  // 상세 (예: '베이직'). 상세 없는 종류는 ''
+  materials: Material[]
 }
 
 // 폼 전체 상태
@@ -25,18 +33,20 @@ export type FormState = {
   requestDate: string             // YYYY-MM-DD (기본: 오늘)
   deadline: string                // YYYY-MM-DD
 
-  // 작업 — 공유 정보
-  channel: Channel | null
-  category: string                // 종류 (예: 'KV')
-  detail: string                  // 상세 (예: '베이직'). 상세 없는 종류는 ''
-
-  // 작업 — 소재 N개 (한 의뢰가 여러 소재로 쪼개지는 경우)
-  materials: Material[]
+  // 작업 — 종류 그룹 N개 (보통 1개, 한 메일에 여러 종류가 섞이면 2~)
+  groups: Group[]
 }
 
 export const EMPTY_MATERIAL: Material = {
   quantity: '1',                  // 대부분의 의뢰가 수량 1로 시작
   note: '',
+}
+
+export const EMPTY_GROUP: Group = {
+  channel: 'online',              // 기본 온라인 (오프라인은 1-2회/년)
+  category: '',
+  detail: '',
+  materials: [{ ...EMPTY_MATERIAL }],
 }
 
 // YYYY-MM-DD 포맷터
@@ -109,8 +119,5 @@ export const INITIAL_FORM_STATE: FormState = {
   requesterIsCustom: false,
   requestDate: today(),
   deadline: '',
-  channel: 'online',
-  category: '',
-  detail: '',
-  materials: [{ ...EMPTY_MATERIAL }],
+  groups: [{ ...EMPTY_GROUP, materials: [{ ...EMPTY_MATERIAL }] }],
 }
