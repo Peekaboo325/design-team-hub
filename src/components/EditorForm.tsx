@@ -12,8 +12,9 @@ import { WorkZone } from './zones/WorkZone'
 import { Button } from './ui/Button'
 import styles from './EditorForm.module.css'
 
-// localStorage 키 — 자료 모델 바뀌면 'v2'로 올려 옛 데이터 자동 무시
-const STORAGE_KEY = 'design-team-hub.form-draft.v1'
+// localStorage 키 — 자료 모델 바뀌면 버전 올려 옛 데이터 자동 무시
+// v2: Material에 id 필드 추가 (2026-05-26)
+const STORAGE_KEY = 'design-team-hub.form-draft.v2'
 
 function loadDraft(): FormState {
   try {

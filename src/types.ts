@@ -5,6 +5,7 @@ export type Material = {
   quantity: string                // 수량 (텍스트로 보유, 등록 시 숫자 변환)
   note: string                    // 작업 내용 (시트 컬럼명은 '비고')
   designer: string                // 배정 디자이너 ('' = 미배정. 팀장이 나중 배정 가능)
+  id: string                      // 행 식별자. 폼 작성 중엔 '' (등록 정규화 시 부여됨)
 }
 
 // 종류 그룹 — 한 메일 안에 여러 종류가 섞일 수 있음 (예: 배너 3개 + KV 1개).
@@ -42,6 +43,7 @@ export const EMPTY_MATERIAL: Material = {
   quantity: '1',                  // 대부분의 의뢰가 수량 1로 시작
   note: '',
   designer: '',                   // 미배정 — 등록 후 팀장이 배정할 수도 있음
+  id: '',                         // 등록 정규화 단계에서 batchId 기반으로 부여
 }
 
 export const EMPTY_GROUP: Group = {
@@ -169,19 +171,40 @@ export function isFormValid(v: Validation): boolean {
   return v.groups.every((g) => g.category && g.detail)
 }
 
-// 등록·시트 쓰기 직전 정규화 — 빈 값 fallback 적용.
+// 8자 hex batch 식별자 — 한 폼 = 한 batch.
+// crypto.randomUUID()의 첫 8자만 사용 (충돌 확률 ≈ 1/4억).
+function generateBatchId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID().replace(/-/g, '').slice(0, 8).toUpperCase()
+  }
+  // 환경 fallback
+  return Math.random().toString(16).slice(2, 10).padEnd(8, '0').toUpperCase()
+}
+
+// 등록·시트 쓰기 직전 정규화 — 빈 값 fallback + 행 ID 부여.
 //   작업 내용 빈 값 → '미정'
 //   수량 빈 값 → '1'
+//   ID → 'b{batchId}-{rowIdx}' (그룹·소재 flatten 순번, batch 단위로 prefix 공유)
+//
+// 이 함수가 ID 발급의 단일 진실 원천. GAS는 빈 L열에만 자동발급하므로 우리 ID 안 덮어씀.
+// 향후 입력 폼이 일원화되면 GAS의 자동발급 로직(Scheduler.assignIdIfNeeded_,
+// widget-api GET 백필, Sync migrate)은 redundant — 정리 검토 대상.
 export function normalizeFormForSubmit(form: FormState): FormState {
+  const batchId = generateBatchId()
+  let rowIdx = 0
   return {
     ...form,
     groups: form.groups.map((g) => ({
       ...g,
-      materials: g.materials.map((m) => ({
-        ...m,
-        quantity: m.quantity.trim() || '1',
-        note: m.note.trim() || '미정',
-      })),
+      materials: g.materials.map((m) => {
+        rowIdx += 1
+        return {
+          ...m,
+          quantity: m.quantity.trim() || '1',
+          note: m.note.trim() || '미정',
+          id: `b${batchId}-${String(rowIdx).padStart(3, '0')}`,
+        }
+      }),
     })),
   }
 }

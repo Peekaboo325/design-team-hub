@@ -117,11 +117,32 @@
 
 ## ID 형식 — design-team-hub batch_id 호환성
 
-**3개 GAS 모두 string equality로만 ID 비교** → design-team-hub가 `bA3F7B2C-01` 같은 batch prefix 형식을 박아도 모든 GAS와 호환됨.
+**3개 GAS 모두 string equality로만 ID 비교** → design-team-hub가 `bA3F7B2C-001` 같은 batch prefix 형식을 박아도 모든 GAS와 호환됨.
 
 GAS 코드 수정 없이 batch 식별 가능. 단 미래 변경 시 이 가정 깨지지 않게 주의.
 
-**유의**: GAS 측에서 자동 발급되는 UUID는 표준 형식(`xxxxxxxx-xxxx-...`)이고, design-team-hub에서 박는 것은 `bXXXX-NN` 형식. **혼재 가능**. 코드 둘 다 처리 OK.
+**현재 박는 형식**: `b{8자 hex}-{3자리 idx}`
+- 예: `bA3F7B2C-001`, `bA3F7B2C-002`, ... (한 폼에서 등록된 행들은 같은 prefix 공유)
+- 생성 위치: `src/types.ts`의 `normalizeFormForSubmit` (등록 정규화 단계)
+- 한 batch에 ≤ 999행 (3자리 idx). 한 폼에서 그 이상 등록할 일 없음.
+- 8자 hex 충돌 확률 ≈ 1/4억. 한 팀 연 1000건 등록해도 사실상 0.
+
+**유의**: GAS 측에서 자동 발급되는 UUID는 표준 형식(`xxxxxxxx-xxxx-...`)이고, design-team-hub에서 박는 것은 `bXXXX-NNN` 형식. **혼재 가능**. 코드 둘 다 처리 OK.
+
+---
+
+## 일원화 후 GAS 정리 검토 (중장기)
+
+design-team-hub가 신규 등록의 **유일한 입력 폼**이 되면, GAS 측의 ID 자동발급 로직은 redundant:
+
+| GAS 함수 | 현재 역할 | 일원화 후 |
+|---|---|---|
+| `Scheduler.assignIdIfNeeded_` | 빈 L열에 onEdit UUID 발급 | redundant (우리가 미리 박음) — **삭제 검토** |
+| `schedule-widget-api.gs` GET 시 빈 ID 백필 | 위젯 조회 시 빈 L열에 UUID 발급 | redundant — **삭제 검토** |
+| `widgetMigrateScheduleIds` / `widgetMigrateCompletedIds` | 기존 행 일괄 마이그레이션 (1회 실행) | 이미 1회로 끝난 작업 — 그대로 두거나 archive |
+| `Synccompletedtodatasheet.migrateDataSheetIds` | 데이터 시트 R열 8000+행 배치 마이그레이션 | 이미 1회 실행. 그대로 두거나 archive |
+
+**다만 안전 위해 일원화 후에도 자동발급 로직은 즉시 삭제 X.** 사람이 시트 직접 편집해서 새 행 만드는 케이스(완전 일원화 못한 동안의 잔여 동선)가 있을 수 있어 안전망으로 유지. 일원화가 검증되고 운영자가 시트 직접 편집을 안 하는 게 확정되면 정리.
 
 ---
 
