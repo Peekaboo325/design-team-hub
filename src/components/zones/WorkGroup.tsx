@@ -13,9 +13,10 @@ type Props = {
   showGroupHeader: boolean         // groups.length > 1일 때만 그룹 헤더(번호 + 제거 버튼) 노출
   onChange: (patch: Partial<Group>) => void
   onRemove: () => void             // 호출자가 groups.length > 1일 때만 사용
+  validation: { category: boolean; detail: boolean }
 }
 
-export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }: Props) {
+export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove, validation }: Props) {
   // 더보기 상태는 그룹별로 독립 — 한 그룹은 펼치고 다른 그룹은 접힘 가능
   const [showAllOnline, setShowAllOnline] = useState(false)
 
@@ -91,7 +92,10 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
       {/* 종류 — 라벨 우측에 오프라인 전환 링크 */}
       <div>
         <div className={styles.categoryHeader}>
-          <span className={styles.fieldLabel}>종류</span>
+          <span className={styles.fieldLabel}>
+            종류
+            {!validation.category && <span className={styles.requiredDot} aria-label="필수" />}
+          </span>
           <button type="button" className={styles.channelSwitch} onClick={toggleChannel}>
             {value.channel === 'online' ? '오프라인 종류 →' : '← 온라인 종류'}
           </button>
@@ -122,10 +126,13 @@ export function WorkGroup({ value, index, showGroupHeader, onChange, onRemove }:
         </div>
       </div>
 
-      {/* 상세 (종류 선택 후, 상세가 있는 종류만 노출) */}
+      {/* 상세 (종류 선택 후, 상세가 있는 종류만 노출). 노출되면 필수. */}
       {value.channel && value.category && details.length > 0 && (
         <div>
-          <span className={styles.fieldLabel}>상세</span>
+          <span className={styles.fieldLabel}>
+            상세
+            {!validation.detail && <span className={styles.requiredDot} aria-label="필수" />}
+          </span>
           <div className={styles.chips}>
             {details.map((d) => (
               <Chip

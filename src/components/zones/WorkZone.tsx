@@ -1,4 +1,4 @@
-import type { FormState, Group } from '../../types'
+import type { FormState, Group, Validation } from '../../types'
 import { EMPTY_GROUP, EMPTY_MATERIAL } from '../../types'
 import { WorkGroup } from './WorkGroup'
 import styles from './Zone.module.css'
@@ -6,9 +6,10 @@ import styles from './Zone.module.css'
 type Props = {
   value: FormState
   onChange: (patch: Partial<FormState>) => void
+  validation: Validation
 }
 
-export function WorkZone({ value, onChange }: Props) {
+export function WorkZone({ value, onChange, validation }: Props) {
   const { groups } = value
   const isMulti = groups.length > 1
 
@@ -44,6 +45,7 @@ export function WorkZone({ value, onChange }: Props) {
             showGroupHeader={isMulti}
             onChange={(patch) => updateGroup(idx, patch)}
             onRemove={() => removeGroup(idx)}
+            validation={validation.groups[idx]}
           />
         ))}
 

@@ -11,6 +11,18 @@
   color: var(--color-text-secondary);
 }
 
+/* 필수 미입력 dot — Zone.module.css와 동일 톤 */
+.requiredDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  margin-left: 6px;
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+
 /* 트리거 버튼 — TextInput과 동일 톤 + 우측 달력 아이콘 */
 .trigger {
   width: 100%;

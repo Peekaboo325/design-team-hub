@@ -301,3 +301,15 @@
   margin-bottom: 8px;
   display: block;
 }
+
+/* 필수 미입력 dot — 라벨 옆에 작게 빨간 점. 채우면 자동 사라짐. */
+.requiredDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  margin-left: 6px;
+  vertical-align: middle;
+  margin-bottom: 2px;
+}

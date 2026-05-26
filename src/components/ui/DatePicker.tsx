@@ -12,6 +12,7 @@ type Props = {
   holidays?: readonly string[]     // YYYY-MM-DD 배열
   disabledBefore?: string          // YYYY-MM-DD. 이 날짜 이전(미포함)은 선택 불가
   placeholder?: string             // 빈 값일 때 trigger에 표시할 회색 안내 텍스트
+  required?: boolean               // 라벨 옆에 빨간 dot 표시 (미입력 안내)
 }
 
 function ymd(d: Date): string {
@@ -30,7 +31,15 @@ function parseYmd(s: string): Date | undefined {
 
 // 토스 톤 캘린더 — react-day-picker v9 + 한국어 locale.
 // 일요일 시작(한국 캘린더 관습). 토(파랑) / 일·공휴일(빨강) 색칠.
-export function DatePicker({ label, value, onChange, holidays = [], disabledBefore, placeholder }: Props) {
+export function DatePicker({
+  label,
+  value,
+  onChange,
+  holidays = [],
+  disabledBefore,
+  placeholder,
+  required,
+}: Props) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -53,7 +62,12 @@ export function DatePicker({ label, value, onChange, holidays = [], disabledBefo
 
   return (
     <div className={styles.field} ref={containerRef}>
-      {label && <span className={styles.label}>{label}</span>}
+      {label && (
+        <span className={styles.label}>
+          {label}
+          {required && <span className={styles.requiredDot} aria-label="필수" />}
+        </span>
+      )}
       <button
         type="button"
         className={triggerCls}

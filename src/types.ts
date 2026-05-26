@@ -1,4 +1,4 @@
-import type { Channel } from './data/team'
+import { WORK_TYPES, type Channel } from './data/team'
 
 // 소재 한 줄 — 같은 종류·상세 안에서 수량·작업내용·디자이너는 소재마다 다를 수 있음.
 export type Material = {
@@ -130,6 +130,60 @@ export function incrementTrailingNumber(s: string): string {
   const [, prefix, numStr, trailing] = match
   const next = String(parseInt(numStr, 10) + 1).padStart(numStr.length, '0')
   return prefix + next + trailing
+}
+
+// ─────────────────────────────────────────────
+// 검증 — 필수 항목 정의.
+// 필수: 팀 / 광고주 / 마감일 / (그룹별) 종류 / 상세(상세 옵션이 있는 종류일 때만)
+// 선택: 메일 제목·비고 / 요청자 / 디자이너 / 작업 내용
+// 자동 채움 (정규화 시): 수량(빈값 → '1'), 작업 내용(빈값 → '미정')
+// ─────────────────────────────────────────────
+export type Validation = {
+  team: boolean
+  advertiser: boolean
+  deadline: boolean
+  groups: { category: boolean; detail: boolean }[]
+}
+
+export function validateForm(form: FormState): Validation {
+  return {
+    team: !!form.team,
+    advertiser: !!form.advertiser,
+    deadline: !!form.deadline,
+    groups: form.groups.map((g) => {
+      const detailOptions =
+        g.channel && g.category
+          ? (WORK_TYPES[g.channel] as Record<string, readonly string[]>)[g.category] ?? []
+          : []
+      const detailRequired = detailOptions.length > 0
+      return {
+        category: !!g.category,
+        detail: !detailRequired || !!g.detail,
+      }
+    }),
+  }
+}
+
+export function isFormValid(v: Validation): boolean {
+  if (!v.team || !v.advertiser || !v.deadline) return false
+  return v.groups.every((g) => g.category && g.detail)
+}
+
+// 등록·시트 쓰기 직전 정규화 — 빈 값 fallback 적용.
+//   작업 내용 빈 값 → '미정'
+//   수량 빈 값 → '1'
+export function normalizeFormForSubmit(form: FormState): FormState {
+  return {
+    ...form,
+    groups: form.groups.map((g) => ({
+      ...g,
+      materials: g.materials.map((m) => ({
+        ...m,
+        quantity: m.quantity.trim() || '1',
+        note: m.note.trim() || '미정',
+      })),
+    })),
+  }
 }
 
 export const INITIAL_FORM_STATE: FormState = {

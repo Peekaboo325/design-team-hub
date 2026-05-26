@@ -1,4 +1,4 @@
-import type { FormState } from '../../types'
+import type { FormState, Validation } from '../../types'
 import { addBusinessDays, weekdayKo } from '../../types'
 import { HOLIDAYS } from '../../data/team'
 import { DatePicker } from '../ui/DatePicker'
@@ -8,6 +8,7 @@ import styles from './Zone.module.css'
 type Props = {
   value: FormState
   onChange: (patch: Partial<FormState>) => void
+  validation: Validation
 }
 
 // 마감일 빠른 선택 — 모두 접수일 기준 N영업일 뒤(토/일/공휴일 자동 스킵).
@@ -21,7 +22,7 @@ const QUICK_OPTIONS: { label: string; days: number }[] = [
   { label: '+5일', days: 5 },
 ]
 
-export function DeadlineZone({ value, onChange }: Props) {
+export function DeadlineZone({ value, onChange, validation }: Props) {
   return (
     <section className={styles.card}>
       <header className={styles.header}>
@@ -46,6 +47,7 @@ export function DeadlineZone({ value, onChange }: Props) {
             holidays={HOLIDAYS}
             disabledBefore={value.requestDate}
             placeholder="YYYY-MM-DD"
+            required={!validation.deadline}
           />
         </div>
 

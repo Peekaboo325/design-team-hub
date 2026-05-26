@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { FormState } from '../../types'
+import type { FormState, Validation } from '../../types'
 import {
   ADVERTISERS,
   ADVERTISERS_BY_TEAM,
@@ -15,6 +15,7 @@ import styles from './Zone.module.css'
 type Props = {
   value: FormState
   onChange: (patch: Partial<FormState>) => void
+  validation: Validation
 }
 
 // 광고주 정렬 — 한글 가나다순 우선, 영문은 뒤로.
@@ -26,7 +27,7 @@ function compareKoreanFirst(a: string, b: string): number {
   return a.localeCompare(b, 'ko')
 }
 
-export function AuthorZone({ value, onChange }: Props) {
+export function AuthorZone({ value, onChange, validation }: Props) {
   // 팀별 후보
   const isInternalTeam = !value.teamIsCustom && (TEAMS as readonly string[]).includes(value.team)
   const team = value.team as (typeof TEAMS)[number]
@@ -89,9 +90,12 @@ export function AuthorZone({ value, onChange }: Props) {
           />
         </div>
 
-        {/* 팀 — 1팀/2팀 칩 + 직접 입력 (인라인) */}
+        {/* 팀 — 1팀/2팀 칩 + 직접 입력 (인라인). 필수. */}
         <div>
-          <span className={styles.fieldLabel}>팀</span>
+          <span className={styles.fieldLabel}>
+            팀
+            {!validation.team && <span className={styles.requiredDot} aria-label="필수" />}
+          </span>
           <div className={styles.chips}>
             {TEAMS.map((t) => (
               <Chip
@@ -176,9 +180,12 @@ export function AuthorZone({ value, onChange }: Props) {
           )}
         </div>
 
-        {/* 광고주 — 팀별 후보 + 더보기 + 직접 입력. 팀 미선택이면 비활성 칩. */}
+        {/* 광고주 — 팀별 후보 + 더보기 + 직접 입력. 팀 미선택이면 비활성 칩. 필수. */}
         <div>
-          <span className={styles.fieldLabel}>광고주</span>
+          <span className={styles.fieldLabel}>
+            광고주
+            {!validation.advertiser && <span className={styles.requiredDot} aria-label="필수" />}
+          </span>
           {!value.teamIsCustom && !isInternalTeam ? (
             <div className={styles.chips}>
               <Chip label="팀을 먼저 선택해주세요" variant="ghost" disabled />
