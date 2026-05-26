@@ -25,7 +25,10 @@ export function DeadlineZone({ value, onChange }: Props) {
   return (
     <section className={styles.card}>
       <header className={styles.header}>
-        <h2 className={styles.title}>일정 정보</h2>
+        <h2 className={styles.title}>
+          일정 정보
+          <span className={styles.titleCaption}>영업일 기반 계산</span>
+        </h2>
       </header>
 
       <div className={styles.deadlineSplit}>

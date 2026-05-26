@@ -22,6 +22,15 @@
   letter-spacing: -0.01em;
 }
 
+/* 제목 옆 같은 줄에 붙는 회색 보조 텍스트 — 세로 공간 안 늘리고 옆 공간 활용 */
+.titleCaption {
+  margin-left: 10px;
+  font-size: var(--fs-caption);
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  letter-spacing: 0;
+}
+
 .subtitle {
   font-size: var(--fs-caption);
   color: var(--color-text-tertiary);
