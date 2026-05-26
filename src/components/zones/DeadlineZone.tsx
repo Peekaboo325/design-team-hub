@@ -1,5 +1,5 @@
 import type { FormState } from '../../types'
-import { addDays, today } from '../../types'
+import { addBusinessDays, todayBusinessDay } from '../../types'
 import { TextInput } from '../ui/TextInput'
 import { Chip } from '../ui/Chip'
 import styles from './Zone.module.css'
@@ -9,20 +9,24 @@ type Props = {
   onChange: (patch: Partial<FormState>) => void
 }
 
-// 마감일 빠른 선택 옵션 — 접수일 기준 +N일.
-// '오늘'은 N=0이 아니라 오늘 날짜 자체로 세팅 (접수일과 무관).
+// 마감일 빠른 선택 — 모두 영업일 기준.
+// '오늘'은 오늘 날짜(주말이면 다음 영업일), '+N일'은 접수일 기준 N영업일 뒤.
+// 결과가 주말이면 다음 영업일로 자동 굴려짐.
 const QUICK_OPTIONS: { label: string; days: number | 'today' }[] = [
   { label: '오늘', days: 'today' },
   { label: '+1일', days: 1 },
+  { label: '+2일', days: 2 },
   { label: '+3일', days: 3 },
-  { label: '+7일', days: 7 },
-  { label: '+14일', days: 14 },
+  { label: '+4일', days: 4 },
+  { label: '+5일', days: 5 },
 ]
 
 export function DeadlineZone({ value, onChange }: Props) {
   const setDeadline = (option: (typeof QUICK_OPTIONS)[number]) => {
     const next =
-      option.days === 'today' ? today() : addDays(value.requestDate, option.days)
+      option.days === 'today'
+        ? todayBusinessDay()
+        : addBusinessDays(value.requestDate, option.days)
     onChange({ deadline: next })
   }
 
@@ -31,7 +35,7 @@ export function DeadlineZone({ value, onChange }: Props) {
       <header className={styles.header}>
         <h2 className={styles.title}>일정</h2>
         <p className={styles.subtitle}>
-          접수일은 기본 오늘. 마감일은 캘린더에서 직접 고르거나 우측 빠른 선택(접수일 기준).
+          접수일은 기본 오늘. 마감일은 캘린더에서 직접 고르거나 우측 빠른 선택(영업일 기준, 주말 자동 스킵).
         </p>
       </header>
 

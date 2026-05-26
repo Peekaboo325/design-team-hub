@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { INITIAL_FORM_STATE, type FormState } from '../types'
-import { MailZone } from './zones/MailZone'
 import { AuthorZone } from './zones/AuthorZone'
 import { DeadlineZone } from './zones/DeadlineZone'
 import { WorkZone } from './zones/WorkZone'
@@ -23,7 +22,6 @@ export function EditorForm() {
       </header>
 
       <div className={styles.zones}>
-        <MailZone value={form} onChange={patch} />
         <AuthorZone value={form} onChange={patch} />
         <DeadlineZone value={form} onChange={patch} />
         <WorkZone value={form} onChange={patch} />

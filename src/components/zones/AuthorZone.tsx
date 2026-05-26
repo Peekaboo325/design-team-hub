@@ -9,6 +9,16 @@ type Props = {
   onChange: (patch: Partial<FormState>) => void
 }
 
+// 광고주 정렬 — 한글 가나다순 우선, 영문은 뒤로.
+// (소스 파일도 이미 정렬되어 있지만, 새 항목을 아무 위치에 넣어도 안전하도록 렌더 시점에도 정렬)
+function compareKoreanFirst(a: string, b: string): number {
+  const isKoreanA = /^[가-힣]/.test(a)
+  const isKoreanB = /^[가-힣]/.test(b)
+  if (isKoreanA && !isKoreanB) return -1
+  if (!isKoreanA && isKoreanB) return 1
+  return a.localeCompare(b, 'ko')
+}
+
 export function AuthorZone({ value, onChange }: Props) {
   // 팀이 내부 팀이면 그 팀 요청자 후보 노출. 외부(직접 입력) 모드면 후보 없음.
   const requesterCandidates =
@@ -16,19 +26,37 @@ export function AuthorZone({ value, onChange }: Props) {
       ? REQUESTERS[value.team as (typeof TEAMS)[number]]
       : []
 
+  const sortedAdvertisers = [...ADVERTISERS].sort(compareKoreanFirst)
+
   return (
     <section className={styles.card}>
       <header className={styles.header}>
         <h2 className={styles.title}>작성자</h2>
-        <p className={styles.subtitle}>광고주, 팀, 요청자(AE). 외부 팀은 직접 입력.</p>
+        <p className={styles.subtitle}>메일 정보 · 광고주 · 팀 · 요청자(AE). 외부 팀은 직접 입력.</p>
       </header>
 
       <div className={styles.body}>
-        {/* 광고주 — 칩 한 화면 */}
+        {/* 메일 — 제목 + 비고 한 줄 */}
+        <div className={styles.mailRow}>
+          <TextInput
+            label="메일 제목"
+            placeholder="예: [관절보궁] 5월 4주차 KV 시안 의뢰"
+            value={value.mailTitle}
+            onChange={(e) => onChange({ mailTitle: e.target.value })}
+          />
+          <TextInput
+            label="메일 비고"
+            placeholder="동일 제목 메일을 구분할 메모 (선택)"
+            value={value.mailNote}
+            onChange={(e) => onChange({ mailNote: e.target.value })}
+          />
+        </div>
+
+        {/* 광고주 — 칩 한 화면 (가나다순 + 영문 뒤) */}
         <div>
           <span className={styles.fieldLabel}>광고주</span>
           <div className={styles.chips}>
-            {ADVERTISERS.map((name) => (
+            {sortedAdvertisers.map((name) => (
               <Chip
                 key={name}
                 label={name}

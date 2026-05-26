@@ -48,6 +48,19 @@
   }
 }
 
+/* 메일 행 — 제목+비고 가로 2칸. 카드 폭을 자연스럽게 쓰도록 1fr 1fr. */
+.mailRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-field);
+}
+
+@media (max-width: 560px) {
+  .mailRow {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* 일정 카드 전용 — 좌측: 날짜 두 개 / 우측: 빠른 선택 칩.
    넓은 화면에선 카드 우측 빈 공간을 빠른 선택이 채움. */
 .deadlineSplit {

@@ -52,10 +52,38 @@ export function today(): string {
   return ymd(new Date())
 }
 
-// 기준일에서 N일 뒤 (기준일 비어있으면 오늘 기준)
-export function addDays(baseDate: string, days: number): string {
+// 토/일 여부
+function isWeekend(d: Date): boolean {
+  const dow = d.getDay()
+  return dow === 0 || dow === 6  // 0=일, 6=토
+}
+
+// 주말이면 다음 평일로 굴림 (in-place)
+function rollToNextBusinessDay(d: Date): void {
+  while (isWeekend(d)) {
+    d.setDate(d.getDate() + 1)
+  }
+}
+
+// 오늘이지만 영업일이 아니면 그다음 영업일
+export function todayBusinessDay(): string {
+  const d = new Date()
+  rollToNextBusinessDay(d)
+  return ymd(d)
+}
+
+// 기준일에서 N영업일 뒤 (기준일 비어있으면 오늘 기준).
+// 기준일이 주말이면 먼저 다음 영업일로 굴린 후 N영업일 추가.
+export function addBusinessDays(baseDate: string, days: number): string {
   const d = baseDate ? new Date(baseDate) : new Date()
-  d.setDate(d.getDate() + days)
+  rollToNextBusinessDay(d)
+  let remaining = days
+  while (remaining > 0) {
+    d.setDate(d.getDate() + 1)
+    if (!isWeekend(d)) {
+      remaining--
+    }
+  }
   return ymd(d)
 }
 
