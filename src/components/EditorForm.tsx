@@ -49,8 +49,9 @@ export function EditorForm() {
   const [form, setForm] = useState<FormState>(() => loadDraft())
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
-  // 중복 의심 — AuthorZone이 onBlur로 갱신, EditorForm은 등록 버튼 옆 안내 + 클리어 책임
   const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([])
+  // Optimistic UI 복원용 — 백그라운드 등록이 실패하면 이 데이터로 폼 복구 가능
+  const [lastFailedForm, setLastFailedForm] = useState<FormState | null>(null)
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -75,6 +76,7 @@ export function EditorForm() {
     setForm(freshInitialState())
     setFeedback(null)
     setDuplicates([])
+    setLastFailedForm(null)
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -82,39 +84,56 @@ export function EditorForm() {
     }
   }
 
+  // Optimistic — 클릭 즉시 폼 초기화 + 성공 메시지.
+  // 백그라운드에서 fetch. 실패 시 메시지를 에러로 교체 + 복원 버튼 노출.
   const handleSubmit = async () => {
     if (!canSubmit) return
-    setSubmitting(true)
-    setFeedback(null)
+
+    const snapshot = form
+    const normalized = normalizeFormForSubmit(snapshot)
+
+    // 즉시 — 폼 초기화 + '등록 완료' 표시 + 등록 버튼 잠시 disabled
+    setForm(freshInitialState())
+    setDuplicates([])
+    setLastFailedForm(null)
     try {
-      const normalized = normalizeFormForSubmit(form)
+      localStorage.removeItem(STORAGE_KEY)
+    } catch {
+      // ignore
+    }
+    setFeedback({ kind: 'ok', message: '✓ 등록 완료' })
+    setSubmitting(true)
+
+    try {
       const result = await createSchedule(normalized)
       if (result.ok) {
         setFeedback({
           kind: 'ok',
-          message: `등록 완료 — ${result.rowsCreated}행 추가됨`,
+          message: `✓ 등록 완료 — ${result.rowsCreated}행 추가됨`,
         })
-        setForm(freshInitialState())
-        setDuplicates([])  // 폼과 함께 중복 경고도 클리어
-        try {
-          localStorage.removeItem(STORAGE_KEY)
-        } catch {
-          // ignore
-        }
       } else {
         setFeedback({
           kind: 'error',
-          message: result.error || '알 수 없는 에러',
+          message: `등록 실패: ${result.error || '알 수 없는 에러'}`,
         })
+        setLastFailedForm(snapshot)
       }
     } catch (err) {
       setFeedback({
         kind: 'error',
-        message: err instanceof Error ? err.message : '네트워크 오류',
+        message: `네트워크 오류: ${err instanceof Error ? err.message : '응답 없음'}`,
       })
+      setLastFailedForm(snapshot)
     } finally {
       setSubmitting(false)
     }
+  }
+
+  const handleRestore = () => {
+    if (!lastFailedForm) return
+    setForm(lastFailedForm)
+    setLastFailedForm(null)
+    setFeedback(null)
   }
 
   return (
@@ -136,7 +155,6 @@ export function EditorForm() {
         <WorkZone value={form} onChange={patch} validation={validation} />
       </div>
 
-      {/* 등록 버튼 옆 안전망 안내 — 사용자가 다시 위로 확인하게 */}
       {duplicates.length > 0 && (
         <div className={styles.dupBanner}>
           ⚠ 메일 제목이 동일한 업무 요청 {duplicates.length}건이 등록되어 있습니다. 신규 등록하시겠습니까?
@@ -149,7 +167,12 @@ export function EditorForm() {
             feedback.kind === 'ok' ? styles.feedbackOk : styles.feedbackError
           }`}
         >
-          {feedback.message}
+          <span>{feedback.message}</span>
+          {feedback.kind === 'error' && lastFailedForm && (
+            <button type="button" className={styles.restoreBtn} onClick={handleRestore}>
+              복원
+            </button>
+          )}
         </div>
       )}
 
