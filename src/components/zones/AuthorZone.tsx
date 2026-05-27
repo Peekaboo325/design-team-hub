@@ -128,7 +128,7 @@ export function AuthorZone({ value, onChange, validation, duplicates, onDuplicat
           {/* 중복 의심 경고 — 메일 제목과 매칭되는 행이 시트에 이미 있을 때 */}
           {duplicates.length > 0 && (
             <div className={styles.dupWarning}>
-              <strong>⚠ 비슷한 업무 요청 {duplicates.length}건이 이미 등록되어 있습니다.</strong>
+              <strong>⚠ 메일 제목이 동일한 업무 요청 {duplicates.length}건이 이미 등록되어 있습니다.</strong>
               <ul>
                 {duplicates.slice(0, 5).map((d) => (
                   <li key={d.id}>
