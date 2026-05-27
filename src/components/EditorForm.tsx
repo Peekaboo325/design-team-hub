@@ -82,12 +82,13 @@ export function EditorForm() {
     return () => clearTimeout(handle)
   }, [form])
 
-  // 성공 메시지는 일정 시간 후 부드럽게 사라짐. progress·error는 유지.
+  // 성공 메시지는 2초 후 부드럽게 사라짐 (opacity + max-height 동시 transition).
+  // progress·error는 유지.
   useEffect(() => {
     setFeedbackFading(false)
     if (feedback?.kind !== 'ok') return
-    const fadeStart = setTimeout(() => setFeedbackFading(true), 3000)  // 3초 후 fade 시작
-    const remove = setTimeout(() => setFeedback(null), 3500)             // 0.5초 transition 후 제거
+    const fadeStart = setTimeout(() => setFeedbackFading(true), 2000)  // 2초 후 fade 시작
+    const remove = setTimeout(() => setFeedback(null), 2400)             // 0.4초 transition 후 제거
     return () => {
       clearTimeout(fadeStart)
       clearTimeout(remove)

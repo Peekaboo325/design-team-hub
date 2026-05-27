@@ -72,12 +72,24 @@
   gap: 12px;
   border: 1px solid transparent;
   opacity: 1;
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, opacity 0.5s ease;
+  max-height: 200px;
+  overflow: hidden;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    opacity 0.3s ease,
+    max-height 0.4s ease,
+    padding-top 0.4s ease,
+    padding-bottom 0.4s ease;
 }
 
-/* 성공 후 3초가 지나면 부드럽게 사라짐 */
+/* 성공 후 2초 지나면 — opacity + 높이 동시에 줄어 아래 콘텐츠가 스르륵 올라옴 */
 .feedbackFading {
   opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 /* 진행 중 — 회색 톤 + 옅은 보더. 응답 후 ok/error로 톤 전환. */
