@@ -102,7 +102,17 @@ export function EditorForm() {
       // ignore
     }
     setSubmitting(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // 화면 최상단으로 — React 리렌더링 직후로 미뤄야 안정적.
+    // window/documentElement/body 모두 시도 (브라우저별 스크롤 컨테이너 차이 우회).
+    requestAnimationFrame(() => {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } catch {
+        window.scrollTo(0, 0)
+      }
+      document.documentElement.scrollTop = 0
+      document.body.scrollTop = 0
+    })
 
     // 백그라운드 fetch — 응답 시점에 메시지 한 번만 표시
     try {

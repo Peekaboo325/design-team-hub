@@ -47,6 +47,7 @@
 /* reset (가볍게) */
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { height: 100%; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background: var(--color-bg);
