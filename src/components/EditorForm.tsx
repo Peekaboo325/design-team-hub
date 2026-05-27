@@ -8,15 +8,13 @@ import {
   validateForm,
   type FormState,
 } from '../types'
-import { createSchedule } from '../api'
+import { createSchedule, type DuplicateMatch } from '../api'
 import { AuthorZone } from './zones/AuthorZone'
 import { DeadlineZone } from './zones/DeadlineZone'
 import { WorkZone } from './zones/WorkZone'
 import { Button } from './ui/Button'
 import styles from './EditorForm.module.css'
 
-// localStorage 키 — 자료 모델 바뀌면 버전 올려 옛 데이터 자동 무시
-// v2: Material에 id 필드 추가 (2026-05-26)
 const STORAGE_KEY = 'design-team-hub.form-draft.v2'
 
 function loadDraft(): FormState {
@@ -38,7 +36,6 @@ function loadDraft(): FormState {
   return freshInitialState()
 }
 
-// 매번 fresh 객체로 초기화 (참조 공유 방지)
 function freshInitialState(): FormState {
   return {
     ...INITIAL_FORM_STATE,
@@ -52,8 +49,9 @@ export function EditorForm() {
   const [form, setForm] = useState<FormState>(() => loadDraft())
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
+  // 중복 의심 — AuthorZone이 onBlur로 갱신, EditorForm은 등록 버튼 옆 안내 + 클리어 책임
+  const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([])
 
-  // 폼 변경 시 디바운스(500ms) localStorage 저장
   useEffect(() => {
     const handle = setTimeout(() => {
       try {
@@ -67,7 +65,7 @@ export function EditorForm() {
 
   const patch = (p: Partial<FormState>) => {
     setForm((prev) => ({ ...prev, ...p }))
-    if (feedback) setFeedback(null)  // 사용자가 다시 수정하면 이전 피드백 클리어
+    if (feedback) setFeedback(null)
   }
 
   const validation = useMemo(() => validateForm(form), [form])
@@ -76,6 +74,7 @@ export function EditorForm() {
   const handleReset = () => {
     setForm(freshInitialState())
     setFeedback(null)
+    setDuplicates([])
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -95,8 +94,8 @@ export function EditorForm() {
           kind: 'ok',
           message: `등록 완료 — ${result.rowsCreated}행 추가됨`,
         })
-        // 성공 시 폼 초기화 + localStorage 비움
         setForm(freshInitialState())
+        setDuplicates([])  // 폼과 함께 중복 경고도 클리어
         try {
           localStorage.removeItem(STORAGE_KEY)
         } catch {
@@ -126,10 +125,23 @@ export function EditorForm() {
       </header>
 
       <div className={styles.zones}>
-        <AuthorZone value={form} onChange={patch} validation={validation} />
+        <AuthorZone
+          value={form}
+          onChange={patch}
+          validation={validation}
+          duplicates={duplicates}
+          onDuplicatesChange={setDuplicates}
+        />
         <DeadlineZone value={form} onChange={patch} validation={validation} />
         <WorkZone value={form} onChange={patch} validation={validation} />
       </div>
+
+      {/* 등록 버튼 옆 안전망 안내 — 사용자가 다시 위로 확인하게 */}
+      {duplicates.length > 0 && (
+        <div className={styles.dupBanner}>
+          ⚠ 메일 제목과 비슷한 업무 요청 {duplicates.length}건이 이미 등록되어 있습니다. 진짜 새 의뢰인지 확인 후 등록해주세요.
+        </div>
+      )}
 
       {feedback && (
         <div
@@ -142,7 +154,6 @@ export function EditorForm() {
       )}
 
       <footer className={styles.footer}>
-        {/* 초기화는 등록과 멀리 떨어진 좌측, 가장 약한 톤(ghost)으로. */}
         <Button variant="ghost" onClick={handleReset} disabled={submitting}>
           초기화
         </Button>

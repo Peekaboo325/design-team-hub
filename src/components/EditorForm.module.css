@@ -46,6 +46,17 @@
   padding: 0 4px;
 }
 
+/* 중복 의심 안전망 안내 — 등록 버튼 누르기 전 한 번 더 인지시키는 배너. */
+.dupBanner {
+  padding: 14px 18px;
+  border-radius: var(--radius-input);
+  background: #FFEBEE;
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: center;
+}
+
 /* 등록 결과 피드백 — 푸터 위 한 줄. 사용자 입력 시작하면 자동 사라짐. */
 .feedback {
   padding: 14px 18px;
