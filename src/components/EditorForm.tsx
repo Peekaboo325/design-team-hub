@@ -43,7 +43,7 @@ function freshInitialState(): FormState {
   }
 }
 
-type Feedback = { kind: 'ok' | 'error'; message: string } | null
+type Feedback = { kind: 'progress' | 'ok' | 'error'; message: string } | null
 
 export function EditorForm() {
   const [form, setForm] = useState<FormState>(() => loadDraft())
@@ -95,7 +95,8 @@ export function EditorForm() {
     setForm(freshInitialState())
     setDuplicates([])
     setLastFailedForm(null)
-    setFeedback(null)
+    // 즉시 진행 중 신호 — 같은 영역에서 응답 후 결과로 톤만 바뀜
+    setFeedback({ kind: 'progress', message: '⟳ 등록 처리 중...' })
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -151,7 +152,11 @@ export function EditorForm() {
       {feedback && (
         <div
           className={`${styles.feedback} ${
-            feedback.kind === 'ok' ? styles.feedbackOk : styles.feedbackError
+            feedback.kind === 'ok'
+              ? styles.feedbackOk
+              : feedback.kind === 'error'
+              ? styles.feedbackError
+              : styles.feedbackProgress
           }`}
         >
           <span>{feedback.message}</span>

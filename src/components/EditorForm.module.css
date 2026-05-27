@@ -58,7 +58,8 @@
 }
 
 /* 등록 결과 피드백 — 푸터 위 한 줄. 사용자 입력 시작하면 자동 사라짐.
-   복원 버튼이 들어갈 수도 있어 flex로. */
+   복원 버튼이 들어갈 수도 있어 flex로.
+   progress → ok/error 톤 전환 시 부드럽게. */
 .feedback {
   padding: 14px 18px;
   border-radius: var(--radius-input);
@@ -69,6 +70,13 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 진행 중 — 회색 톤. 클릭 즉시 표시, 응답 받으면 ok/error로 톤 전환. */
+.feedbackProgress {
+  background: #F2F4F6;
+  color: var(--color-text-secondary);
 }
 
 /* 실패 시 데이터 복원 버튼 */
