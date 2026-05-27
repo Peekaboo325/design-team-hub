@@ -50,7 +50,6 @@ export function EditorForm() {
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
   const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([])
-  // Optimistic UI 복원용 — 백그라운드 등록이 실패하면 이 데이터로 폼 복구 가능
   const [lastFailedForm, setLastFailedForm] = useState<FormState | null>(null)
 
   useEffect(() => {
@@ -84,26 +83,28 @@ export function EditorForm() {
     }
   }
 
-  // Optimistic — 클릭 즉시 폼 초기화 + 성공 메시지.
-  // 백그라운드에서 fetch. 실패 시 메시지를 에러로 교체 + 복원 버튼 노출.
+  // Optimistic — 클릭 즉시 폼 초기화 + 화면 상단으로 스크롤.
+  // 메시지는 응답 후에 한 번만 (성공/실패).
   const handleSubmit = async () => {
     if (!canSubmit) return
 
     const snapshot = form
     const normalized = normalizeFormForSubmit(snapshot)
 
-    // 즉시 — 폼 초기화 + '등록 완료' 표시 + 등록 버튼 잠시 disabled
+    // 즉시 — 폼 초기화 + 이전 메시지 클리어 + 위로 스크롤
     setForm(freshInitialState())
     setDuplicates([])
     setLastFailedForm(null)
+    setFeedback(null)
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
       // ignore
     }
-    setFeedback({ kind: 'ok', message: '✓ 등록 완료' })
     setSubmitting(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
 
+    // 백그라운드 fetch — 응답 시점에 메시지 한 번만 표시
     try {
       const result = await createSchedule(normalized)
       if (result.ok) {
@@ -143,6 +144,22 @@ export function EditorForm() {
         <p className={styles.pageDesc}>새 스케줄 한 건을 등록합니다.</p>
       </header>
 
+      {/* 등록 결과 피드백 — 위로 스크롤된 사용자 시야에 보이도록 헤더 바로 아래 */}
+      {feedback && (
+        <div
+          className={`${styles.feedback} ${
+            feedback.kind === 'ok' ? styles.feedbackOk : styles.feedbackError
+          }`}
+        >
+          <span>{feedback.message}</span>
+          {feedback.kind === 'error' && lastFailedForm && (
+            <button type="button" className={styles.restoreBtn} onClick={handleRestore}>
+              복원
+            </button>
+          )}
+        </div>
+      )}
+
       <div className={styles.zones}>
         <AuthorZone
           value={form}
@@ -158,21 +175,6 @@ export function EditorForm() {
       {duplicates.length > 0 && (
         <div className={styles.dupBanner}>
           ⚠ 메일 제목이 동일한 업무 요청 {duplicates.length}건이 등록되어 있습니다. 신규 등록하시겠습니까?
-        </div>
-      )}
-
-      {feedback && (
-        <div
-          className={`${styles.feedback} ${
-            feedback.kind === 'ok' ? styles.feedbackOk : styles.feedbackError
-          }`}
-        >
-          <span>{feedback.message}</span>
-          {feedback.kind === 'error' && lastFailedForm && (
-            <button type="button" className={styles.restoreBtn} onClick={handleRestore}>
-              복원
-            </button>
-          )}
         </div>
       )}
 
