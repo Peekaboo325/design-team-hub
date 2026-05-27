@@ -57,10 +57,10 @@
   }
 }
 
-/* 메일 행 — 제목+비고 가로 2칸. 카드 폭을 자연스럽게 쓰도록 1fr 1fr. */
+/* 메일 행 — 제목 60% / 비고 40% (3:2). 제목이 길어서 더 넓게. */
 .mailRow {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 3fr 2fr;
   gap: var(--space-field);
 }
 
