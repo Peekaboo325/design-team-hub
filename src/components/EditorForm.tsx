@@ -139,7 +139,7 @@ export function EditorForm() {
       {/* 등록 버튼 옆 안전망 안내 — 사용자가 다시 위로 확인하게 */}
       {duplicates.length > 0 && (
         <div className={styles.dupBanner}>
-          ⚠ 메일 제목과 비슷한 업무 요청 {duplicates.length}건이 이미 등록되어 있습니다. 진짜 새 의뢰인지 확인 후 등록해주세요.
+          ⚠ 메일 제목이 동일한 업무 요청이 {duplicates.length}건이 등록되어 있습니다. 신규 등록하시겠습니까?
         </div>
       )}
 
