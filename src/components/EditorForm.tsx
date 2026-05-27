@@ -67,6 +67,7 @@ export function EditorForm() {
   const [form, setForm] = useState<FormState>(() => loadDraft())
   const [submitting, setSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<Feedback>(null)
+  const [feedbackFading, setFeedbackFading] = useState(false)
   const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([])
   const [lastFailedForm, setLastFailedForm] = useState<FormState | null>(null)
 
@@ -80,6 +81,18 @@ export function EditorForm() {
     }, 500)
     return () => clearTimeout(handle)
   }, [form])
+
+  // 성공 메시지는 일정 시간 후 부드럽게 사라짐. progress·error는 유지.
+  useEffect(() => {
+    setFeedbackFading(false)
+    if (feedback?.kind !== 'ok') return
+    const fadeStart = setTimeout(() => setFeedbackFading(true), 3000)  // 3초 후 fade 시작
+    const remove = setTimeout(() => setFeedback(null), 3500)             // 0.5초 transition 후 제거
+    return () => {
+      clearTimeout(fadeStart)
+      clearTimeout(remove)
+    }
+  }, [feedback])
 
   const patch = (p: Partial<FormState>) => {
     setForm((prev) => ({ ...prev, ...p }))
@@ -132,7 +145,7 @@ export function EditorForm() {
       if (result.ok) {
         setFeedback({
           kind: 'ok',
-          message: `✓ 등록 완료 — ${result.rowsCreated}행 추가됨`,
+          message: `✓ ${result.rowsCreated}건 등록 완료`,
         })
       } else {
         setFeedback({
@@ -169,13 +182,17 @@ export function EditorForm() {
       {/* 등록 결과 피드백 — 위로 스크롤된 사용자 시야에 보이도록 헤더 바로 아래 */}
       {feedback && (
         <div
-          className={`${styles.feedback} ${
+          className={[
+            styles.feedback,
             feedback.kind === 'ok'
               ? styles.feedbackOk
               : feedback.kind === 'error'
               ? styles.feedbackError
-              : styles.feedbackProgress
-          }`}
+              : styles.feedbackProgress,
+            feedbackFading ? styles.feedbackFading : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
         >
           {feedback.kind === 'progress' && <Spinner />}
           <span>{feedback.message}</span>
