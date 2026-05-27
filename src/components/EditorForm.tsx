@@ -45,6 +45,24 @@ function freshInitialState(): FormState {
 
 type Feedback = { kind: 'progress' | 'ok' | 'error'; message: string } | null
 
+// 빙글빙글 스피너 — 진행 중 시각 표시. CSS animation으로 회전.
+function Spinner() {
+  return (
+    <svg className={styles.spinner} viewBox="0 0 24 24" width="18" height="18">
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray="40 60"
+      />
+    </svg>
+  )
+}
+
 export function EditorForm() {
   const [form, setForm] = useState<FormState>(() => loadDraft())
   const [submitting, setSubmitting] = useState(false)
@@ -95,8 +113,8 @@ export function EditorForm() {
     setForm(freshInitialState())
     setDuplicates([])
     setLastFailedForm(null)
-    // 즉시 진행 중 신호 — 같은 영역에서 응답 후 결과로 톤만 바뀜
-    setFeedback({ kind: 'progress', message: '⟳ 등록 처리 중...' })
+    // 즉시 진행 중 신호 — spinner + 메시지. 응답 후 같은 영역에서 결과로 톤 전환.
+    setFeedback({ kind: 'progress', message: '등록 처리 중...' })
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -159,6 +177,7 @@ export function EditorForm() {
               : styles.feedbackProgress
           }`}
         >
+          {feedback.kind === 'progress' && <Spinner />}
           <span>{feedback.message}</span>
           {feedback.kind === 'error' && lastFailedForm && (
             <button type="button" className={styles.restoreBtn} onClick={handleRestore}>

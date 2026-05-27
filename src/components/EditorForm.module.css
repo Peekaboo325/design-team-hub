@@ -79,6 +79,16 @@
   color: var(--color-text-secondary);
 }
 
+/* 빙글빙글 spinner — 진행 중일 때 메시지 좌측에 회전. */
+@keyframes spinner-rotate {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  animation: spinner-rotate 0.8s linear infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
 /* 실패 시 데이터 복원 버튼 */
 .restoreBtn {
   padding: 6px 14px;
