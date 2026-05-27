@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import type { FormState, Validation } from '../../types'
 import {
   ADVERTISERS,
@@ -7,6 +7,7 @@ import {
   REQUESTERS,
   REQUESTER_DEFAULT_ADVERTISERS,
 } from '../../data/team'
+import { checkDuplicates, type DuplicateMatch } from '../../api'
 import { Chip } from '../ui/Chip'
 import { ChipInput } from '../ui/ChipInput'
 import { TextInput } from '../ui/TextInput'
@@ -69,6 +70,29 @@ export function AuthorZone({ value, onChange, validation }: Props) {
       : []
   const hasEmphasis = requesterDefaults.length > 0
 
+  // 메일 제목 중복 감지 — onBlur 시 GAS에 조회. 매칭 발견 시 인라인 경고.
+  // 같은 제목 반복 조회 방지를 위해 마지막 조회 제목 ref에 저장.
+  const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([])
+  const lastCheckedTitle = useRef<string>('')
+
+  const handleMailTitleBlur = async () => {
+    const title = value.mailTitle.trim()
+    if (!title) {
+      setDuplicates([])
+      lastCheckedTitle.current = ''
+      return
+    }
+    if (title === lastCheckedTitle.current) return  // 변경 없음 — 재조회 skip
+    lastCheckedTitle.current = title
+    try {
+      const result = await checkDuplicates(title)
+      if ('matches' in result) setDuplicates(result.matches)
+      else setDuplicates([])
+    } catch {
+      setDuplicates([])  // 네트워크 실패 시 조용히 (사용자 차단 X)
+    }
+  }
+
   return (
     <section className={styles.card}>
       <header className={styles.header}>
@@ -77,17 +101,41 @@ export function AuthorZone({ value, onChange, validation }: Props) {
 
       <div className={styles.body}>
         {/* 메일 — 제목 + 비고 한 줄 */}
-        <div className={styles.mailRow}>
-          <TextInput
-            label="메일 제목"
-            value={value.mailTitle}
-            onChange={(e) => onChange({ mailTitle: e.target.value })}
-          />
-          <TextInput
-            label="메일 비고"
-            value={value.mailNote}
-            onChange={(e) => onChange({ mailNote: e.target.value })}
-          />
+        <div>
+          <div className={styles.mailRow}>
+            <TextInput
+              label="메일 제목"
+              value={value.mailTitle}
+              onChange={(e) => onChange({ mailTitle: e.target.value })}
+              onBlur={handleMailTitleBlur}
+            />
+            <TextInput
+              label="메일 비고"
+              value={value.mailNote}
+              onChange={(e) => onChange({ mailNote: e.target.value })}
+            />
+          </div>
+
+          {/* 중복 의심 경고 — 메일 제목과 매칭되는 행이 시트에 이미 있을 때 */}
+          {duplicates.length > 0 && (
+            <div className={styles.dupWarning}>
+              <strong>⚠ 비슷한 의뢰 {duplicates.length}건이 이미 등록되어 있습니다.</strong>
+              <ul>
+                {duplicates.slice(0, 5).map((d) => (
+                  <li key={d.id}>
+                    {d.advertiser}
+                    {d.category ? ` · ${d.category}` : ''}
+                    {d.note ? ` · ${d.note}` : ''}
+                    {d.designer ? ` · ${d.designer}` : ''}
+                    {d.requester ? ` (${d.requester})` : ''}
+                  </li>
+                ))}
+              </ul>
+              {duplicates.length > 5 && (
+                <span className={styles.dupMore}>외 {duplicates.length - 5}건</span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 팀 — 1팀/2팀 칩 + 직접 입력 (인라인). 필수. */}
