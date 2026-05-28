@@ -136,7 +136,7 @@ export function AuthorZone({ value, onChange, validation, duplicates, onDuplicat
                     {d.category ? ` · ${d.category}` : ''}
                     {d.note ? ` · ${d.note}` : ''}
                     {d.designer ? ` · ${d.designer}` : ''}
-                    {d.requester ? ` (${d.requester})` : ''}
+                    {(d.rowCount ?? 1) > 1 ? ' 외 다수' : ''}
                   </li>
                 ))}
               </ul>
@@ -193,7 +193,7 @@ export function AuthorZone({ value, onChange, validation, duplicates, onDuplicat
         {/* 요청자 — 팀 따라 후보 또는 직접 입력 (인라인).
             팀 미선택이면 '팀을 먼저 선택해주세요' 비활성 칩으로 영역 유지. */}
         <div>
-          <span className={styles.fieldLabel}>요청자(기획자)</span>
+          <span className={styles.fieldLabel}>요청자</span>
           {value.teamIsCustom ? (
             <div className={styles.chips}>
               <ChipInput

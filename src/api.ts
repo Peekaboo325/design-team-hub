@@ -15,6 +15,7 @@ export type DuplicateMatch = {
   category: string
   note: string         // J열 셀 값 = 작업 내용
   mailTitle: string    // J열 셀 메모의 첫 줄
+  rowCount?: number    // 이 batch의 총 행 수 (>1이면 '외 다수' 표시)
 }
 
 export type CheckDuplicatesResult =
