@@ -177,7 +177,7 @@ export function EditorForm() {
     <div className={styles.page}>
       <header className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>스케줄 등록</h1>
-        <p className={styles.pageDesc}>새 스케줄 한 건을 등록합니다.</p>
+        <p className={styles.pageDesc}>신규 업무 스케줄을 등록합니다.</p>
       </header>
 
       {/* 등록 결과 피드백 — 위로 스크롤된 사용자 시야에 보이도록 헤더 바로 아래 */}
