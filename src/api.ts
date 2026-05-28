@@ -49,6 +49,39 @@ export async function createSchedule(form: FormState): Promise<CreateScheduleRes
   return postWithBusyRetry<CreateScheduleResult>({ action: 'create', form })
 }
 
+// hub-api.gs v0.10 listSchedules 응답의 행 한 건
+export type ScheduleRow = {
+  row: number                // 시트 행번호 (편집 시 fallback)
+  id: string
+  type: string               // 일반 / 급건 / 여유
+  team: string
+  requester: string
+  advertiser: string
+  designer: string
+  channel: string            // online / offline
+  category: string           // '웹진형페이지' / '배너(GIF)' 등 종류(난이도)
+  quantity: number | null
+  note: string               // J열 셀 값 (작업 내용)
+  mailTitle: string          // J열 메모 첫 문단
+  mailNote: string           // J열 메모 두번째 문단~
+  status: '예정' | '대기' | '진행' | '완료' | string
+  shared: boolean
+  receivedDate: string       // YYYY-MM-DD ('' = 색칠 없음)
+  deadline: string           // YYYY-MM-DD ('' = 마감일 색칠 없음, 당일 급건 등)
+}
+
+export type ListSchedulesResult =
+  | { ok: true; rows: ScheduleRow[]; sheetName: string; fetchedAt: string }
+  | { ok?: false; error: string }
+
+// 시트 데이터 전체 fetch — GET. 캐시 우회 timestamp.
+export async function listSchedules(): Promise<ListSchedulesResult> {
+  const url = `${GAS_URL}?action=list&_=${Date.now()}`
+  const res = await fetch(url, { method: 'GET', redirect: 'follow' })
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
+  return res.json()
+}
+
 // 메일 제목 중복 감지 — 읽기 전용. BUSY 안 발생. 캐시 우회 시도.
 export async function checkDuplicates(mailTitle: string): Promise<CheckDuplicatesResult> {
   if (!mailTitle.trim()) return { matches: [] }

@@ -1,0 +1,125 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 32px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-section);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 4px;
+  margin-bottom: 8px;
+}
+
+.headerMain {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pageTitle {
+  font-size: var(--fs-h1);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.pageDesc {
+  font-size: var(--fs-label);
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  font-feature-settings: 'tnum';
+}
+
+.refreshBtn {
+  padding: 10px 18px;
+  border-radius: var(--radius-button);
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-label);
+  font-weight: 600;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+
+.refreshBtn:hover:not(:disabled) {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.refreshBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 본문 */
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 행 리스트 — 카드 한 장 안에 행들이 줄지어 들어가는 구조 */
+.list {
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* placeholder / error */
+.placeholder {
+  padding: 80px 24px;
+  text-align: center;
+  font-size: var(--fs-label);
+  color: var(--color-text-tertiary);
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+.errorBox {
+  padding: 32px;
+  background: var(--color-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.errorTitle {
+  font-size: var(--fs-body);
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.errorMessage {
+  font-size: var(--fs-label);
+  color: var(--color-text-secondary);
+  text-align: center;
+  word-break: break-word;
+  max-width: 600px;
+}
+
+.retryBtn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  border-radius: var(--radius-button);
+  background: var(--color-primary);
+  color: white;
+  font-size: var(--fs-label);
+  font-weight: 700;
+}
+
+.retryBtn:hover {
+  background: var(--color-primary-hover);
+}
