@@ -228,6 +228,7 @@ export const ONLINE_DEFAULT_CATEGORIES = [
   '배너',
   '웹진형페이지',
   '정보형페이지',
+  '사이즈베리',
   '유지보수',
   '사내',
   '기타',
