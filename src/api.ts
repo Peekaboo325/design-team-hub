@@ -1,4 +1,5 @@
 import { GAS_URL } from './config'
+import { getCurrentSheet } from './currentSheet'
 import type { FormState } from './types'
 
 // hub-api.gs의 createSchedule 응답 형식
@@ -25,12 +26,14 @@ export type CheckDuplicatesResult =
 // GAS Web App에 POST. BUSY 응답이면 지수 backoff로 재시도 (max 2회).
 // CORS 회피를 위해 Content-Type 미지정 (GAS는 e.postData.contents로 raw 받음).
 // Cache-busting: URL에 timestamp 붙여 GAS Web App의 알려진 응답 캐싱 우회 시도.
-async function postWithBusyRetry<T>(body: unknown, maxRetries = 2): Promise<T> {
+// 모든 POST body에 현재 시트 이름 자동 첨부.
+async function postWithBusyRetry<T>(body: Record<string, unknown>, maxRetries = 2): Promise<T> {
+  const bodyWithSheet = { ...body, sheet: getCurrentSheet() }
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const url = `${GAS_URL}?_=${Date.now()}-${attempt}`
     const res = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify(bodyWithSheet),
       redirect: 'follow',
     })
     if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
@@ -74,21 +77,22 @@ export type ListSchedulesResult =
   | { ok: true; rows: ScheduleRow[]; sheetName: string; fetchedAt: string }
   | { ok?: false; error: string }
 
-// 시트 데이터 전체 fetch — GET. 캐시 우회 timestamp.
+// 시트 데이터 전체 fetch — GET. 캐시 우회 timestamp + 현재 시트 첨부.
 export async function listSchedules(): Promise<ListSchedulesResult> {
-  const url = `${GAS_URL}?action=list&_=${Date.now()}`
+  const sheet = encodeURIComponent(getCurrentSheet())
+  const url = `${GAS_URL}?action=list&sheet=${sheet}&_=${Date.now()}`
   const res = await fetch(url, { method: 'GET', redirect: 'follow' })
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)
   return res.json()
 }
 
-// 메일 제목 중복 감지 — 읽기 전용. BUSY 안 발생. 캐시 우회 시도.
+// 메일 제목 중복 감지 — 읽기 전용. BUSY 안 발생. 캐시 우회 시도. 시트 첨부.
 export async function checkDuplicates(mailTitle: string): Promise<CheckDuplicatesResult> {
   if (!mailTitle.trim()) return { matches: [] }
   const url = `${GAS_URL}?_=${Date.now()}`
   const res = await fetch(url, {
     method: 'POST',
-    body: JSON.stringify({ action: 'check-duplicates', mailTitle }),
+    body: JSON.stringify({ action: 'check-duplicates', mailTitle, sheet: getCurrentSheet() }),
     redirect: 'follow',
   })
   if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`)

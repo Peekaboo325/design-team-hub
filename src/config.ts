@@ -3,3 +3,15 @@
 // DATA_CONTRACT.md §5 — GAS URL 운영 규칙 참조.
 export const GAS_URL =
   'https://script.google.com/macros/s/AKfycbzarWuu2Hxt28hvkLU54pchLuKsrnwQyMeFjb6lezsT7wG9DjQn8h6RXJqUlm5rjAm8yA/exec'
+
+// 시트 allowlist — GAS의 HUB_SHEET_ALLOWLIST와 반드시 일치 유지.
+// 새 시트 추가 시 GAS와 여기 양쪽 갱신 필요.
+export const SHEETS = {
+  TEST: '💛신규·유지보수_TEST',
+  PRODUCTION: '💛신규·유지보수',
+} as const
+
+export type SheetName = (typeof SHEETS)[keyof typeof SHEETS]
+
+// 운영 전환 시점에 PRODUCTION으로 교체.
+export const DEFAULT_SHEET: SheetName = SHEETS.TEST

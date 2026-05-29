@@ -1,0 +1,37 @@
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-chip);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  border-radius: var(--radius-chip);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  transition: background 120ms ease, color 120ms ease;
+  white-space: nowrap;
+}
+
+.option:hover:not(.active) {
+  color: var(--color-text-secondary);
+}
+
+.active {
+  background: var(--color-card);
+  color: var(--color-text);
+  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.08);
+}
+
+.icon {
+  font-size: 12px;
+  line-height: 1;
+}

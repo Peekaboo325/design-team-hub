@@ -1,13 +1,13 @@
 // ============================================================
-// hub-api.gs (v0.10) — design-team-hub 전용 Web App (standalone)
+// hub-api.gs (v0.11) — design-team-hub 전용 Web App (standalone)
 //
-// v0.10 변경 — list 액션 추가:
-//   doGet/doPost 모두 action=list 지원.
-//   시트의 데이터 행 전부를 JSON 배열로 응답.
-//   색칠 → 날짜 추출 (빨강=receivedDate, 가장 오른쪽 핑크=deadline).
-//   메모 분리 (\n\n 기준 mailTitle / mailNote).
-//   GET 지원 — 폴링 시 CORS preflight 없음, 디버깅 편함.
+// v0.11 변경 — 시트 allowlist + 파라미터 지원:
+//   HUB_TARGET_SHEET 단일 상수 제거 → HUB_SHEET_ALLOWLIST 배열 + HUB_DEFAULT_SHEET.
+//   doGet: e.parameter.sheet, doPost: body.sheet 로 시트 이름 전달 가능.
+//   파라미터 없으면 기본값, allowlist 밖이면 에러.
+//   → 테스트 ↔ 실 시트 전환 시 GAS 재배포 없이 클라이언트만 갱신.
 //
+// v0.10 — list 액션 추가
 // v0.9 — checkDuplicates 응답에 rowCount 추가
 // v0.8 — batch 단위 dedupe
 // v0.7 — 초기 상태 조건부 (대기/예정)
@@ -17,8 +17,15 @@
 
 const HUB_SPREADSHEET_ID = '1-zGcP9ao6qGjNXRAijxU9rOar88bHIZHw_HKleBc2Ys';
 
-// ▶ 첫 운영용 — 검증 끝나면 '💛신규·유지보수'로 교체
-const HUB_TARGET_SHEET = '💛신규·유지보수_TEST';
+// 시트 allowlist — 클라이언트가 sheet 파라미터로 지정 가능.
+// 새 시트 추가하려면 여기에 박아둘 것 (보안 — 외부에서 임의 시트 접근 차단).
+const HUB_SHEET_ALLOWLIST = [
+  '💛신규·유지보수_TEST',
+  '💛신규·유지보수',
+];
+
+// 파라미터 누락 시 기본값.
+const HUB_DEFAULT_SHEET = '💛신규·유지보수_TEST';
 
 const HUB_DATA_START_ROW = 10;
 const HUB_DATE_HEADER_ROW = 9;
@@ -45,7 +52,8 @@ const HUB_DEFAULT_COLOR     = '#ffffff';
 function doGet(e) {
   try {
     const action = (e && e.parameter && e.parameter.action) || '';
-    if (action === 'list') return jsonResponse(listSchedules());
+    const sheet = resolveSheetName((e && e.parameter && e.parameter.sheet) || '');
+    if (action === 'list') return jsonResponse(listSchedules(sheet));
     return jsonResponse({ error: 'unknown action: ' + action });
   } catch (err) {
     return jsonResponse({ error: err.message, stack: err.stack });
@@ -55,26 +63,36 @@ function doGet(e) {
 function doPost(e) {
   try {
     const body = JSON.parse((e.postData && e.postData.contents) || '{}');
-    if (body.action === 'create') return jsonResponse(createSchedule(body.form));
-    if (body.action === 'check-duplicates') return jsonResponse(checkDuplicates(body));
-    if (body.action === 'list') return jsonResponse(listSchedules());
+    const sheet = resolveSheetName(body.sheet || '');
+    if (body.action === 'create') return jsonResponse(createSchedule(body.form, sheet));
+    if (body.action === 'check-duplicates') return jsonResponse(checkDuplicates(body, sheet));
+    if (body.action === 'list') return jsonResponse(listSchedules(sheet));
     return jsonResponse({ error: 'unknown action: ' + body.action });
   } catch (err) {
     return jsonResponse({ error: err.message, stack: err.stack });
   }
 }
 
+// 시트 이름 검증 — 빈 값은 기본값, allowlist 밖이면 throw.
+function resolveSheetName(name) {
+  if (!name) return HUB_DEFAULT_SHEET;
+  if (HUB_SHEET_ALLOWLIST.indexOf(name) === -1) {
+    throw new Error('허용되지 않은 시트: ' + name);
+  }
+  return name;
+}
+
 // ============================================================
 // list — 시트 데이터 행 전부를 JSON 배열로 (v0.10)
 // ============================================================
 
-function listSchedules() {
-  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(HUB_TARGET_SHEET);
-  if (!sheet) return { error: '시트 없음: ' + HUB_TARGET_SHEET };
+function listSchedules(sheetName) {
+  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(sheetName);
+  if (!sheet) return { error: '시트 없음: ' + sheetName };
 
   const lastRow = sheet.getLastRow();
   if (lastRow < HUB_DATA_START_ROW) {
-    return { ok: true, rows: [], sheetName: HUB_TARGET_SHEET, fetchedAt: new Date().toISOString() };
+    return { ok: true, rows: [], sheetName: sheetName, fetchedAt: new Date().toISOString() };
   }
 
   const dataRowCount = lastRow - HUB_DATA_START_ROW + 1;
@@ -147,7 +165,7 @@ function listSchedules() {
   return {
     ok: true,
     rows: rows,
-    sheetName: HUB_TARGET_SHEET,
+    sheetName: sheetName,
     fetchedAt: new Date().toISOString(),
   };
 }
@@ -174,7 +192,7 @@ function formatHeaderDate(v) {
 // createSchedule — 폼에서 받은 batch를 시트에 기록 (v0.5.x~)
 // ============================================================
 
-function createSchedule(form) {
+function createSchedule(form, sheetName) {
   if (!form) return { error: 'form 누락' };
   if (!form.team || !form.advertiser || !form.requestDate || !form.deadline) {
     return { error: '필수 항목 누락 (team/advertiser/requestDate/deadline)' };
@@ -183,8 +201,8 @@ function createSchedule(form) {
     return { error: '그룹 없음' };
   }
 
-  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(HUB_TARGET_SHEET);
-  if (!sheet) return { error: '시트 없음: ' + HUB_TARGET_SHEET };
+  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(sheetName);
+  if (!sheet) return { error: '시트 없음: ' + sheetName };
 
   const lock = LockService.getScriptLock();
   try { lock.waitLock(10000); } catch (e) { return { error: 'busy', code: 'BUSY' }; }
@@ -362,13 +380,13 @@ function sortSheet(sheet) {
 // ============================================================
 // checkDuplicates — batch 단위 dedupe + 각 batch의 rowCount 응답 (v0.9)
 // ============================================================
-function checkDuplicates(body) {
+function checkDuplicates(body, sheetName) {
   const raw = (body && body.mailTitle) || '';
   const queryNorm = normalizeMailTitle(raw);
   if (!queryNorm) return { matches: [] };
 
-  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(HUB_TARGET_SHEET);
-  if (!sheet) return { error: '시트 없음: ' + HUB_TARGET_SHEET };
+  const sheet = SpreadsheetApp.openById(HUB_SPREADSHEET_ID).getSheetByName(sheetName);
+  if (!sheet) return { error: '시트 없음: ' + sheetName };
 
   const lastRow = sheet.getLastRow();
   if (lastRow < HUB_DATA_START_ROW) return { matches: [] };
