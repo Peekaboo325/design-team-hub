@@ -1,12 +1,15 @@
 // ============================================================
-// hub-api.gs (v0.11) — design-team-hub 전용 Web App (standalone)
+// hub-api.gs (v0.12) — design-team-hub 전용 Web App (standalone)
 //
-// v0.11 변경 — 시트 allowlist + 파라미터 지원:
-//   HUB_TARGET_SHEET 단일 상수 제거 → HUB_SHEET_ALLOWLIST 배열 + HUB_DEFAULT_SHEET.
-//   doGet: e.parameter.sheet, doPost: body.sheet 로 시트 이름 전달 가능.
-//   파라미터 없으면 기본값, allowlist 밖이면 에러.
-//   → 테스트 ↔ 실 시트 전환 시 GAS 재배포 없이 클라이언트만 갱신.
+// v0.12 변경:
+//   1. sortSheet 정렬 규칙 변경 — 광고주 그룹 우선.
+//      같은 광고주는 무조건 인접. 그룹 위치는 그룹 내 최소 요청일 기준.
+//      그룹 안에서는 마감일 → 요청일 순.
+//      → 디자인팀 평소 운영 방식과 일치 (1팀+2팀 같은 광고주가 한 묶음).
+//   2. 정렬 끝에 유효 행(데이터 있는 행)의 B~끝열에 #000 SOLID 보더 자동 적용.
+//      신규·기존 행 모두 통일된 격자 표시.
 //
+// v0.11 — 시트 allowlist + 파라미터 지원
 // v0.10 — list 액션 추가
 // v0.9 — checkDuplicates 응답에 rowCount 추가
 // v0.8 — batch 단위 dedupe
@@ -339,42 +342,53 @@ function sortSheet(sheet) {
     if (b === -1) return -1;
     return a - b;
   }
-  validRows.sort(function(a, b) {
-    return cmpCol(a.deadlineColIdx, b.deadlineColIdx) ||
-           cmpCol(a.requestColIdx, b.requestColIdx);
-  });
 
-  let i = 0;
-  while (i < validRows.length) {
-    let j = i + 1;
-    while (j < validRows.length &&
-           validRows[j].deadlineColIdx === validRows[i].deadlineColIdx &&
-           validRows[j].requestColIdx === validRows[i].requestColIdx) {
-      j++;
+  // 광고주별 그룹화 — 등장 순으로 키 추적 (같은 minRequest일 때 tie-breaker)
+  const groupMap = {};   // 광고주 → { rows: [], minRequest: number }
+  const groupOrder = []; // 등장 순
+  for (let i = 0; i < validRows.length; i++) {
+    const r = validRows[i];
+    const adv = r.advertiser;
+    if (!groupMap[adv]) {
+      groupMap[adv] = { rows: [], minRequest: Infinity };
+      groupOrder.push(adv);
     }
-    if (j - i > 1) {
-      const sub = validRows.slice(i, j);
-      const firstSeen = {};
-      for (let k = 0; k < sub.length; k++) {
-        const adv = sub[k].advertiser;
-        if (!(adv in firstSeen)) firstSeen[adv] = k;
-      }
-      sub.sort(function(a, b) {
-        return firstSeen[a.advertiser] - firstSeen[b.advertiser];
-      });
-      for (let k = 0; k < sub.length; k++) {
-        validRows[i + k] = sub[k];
-      }
-    }
-    i = j;
+    groupMap[adv].rows.push(r);
+    const req = r.requestColIdx === -1 ? Infinity : r.requestColIdx;
+    if (req < groupMap[adv].minRequest) groupMap[adv].minRequest = req;
   }
 
-  const sorted = validRows.concat(emptyRows);
+  // 그룹 안에서는 마감일 → 요청일 순
+  for (let g = 0; g < groupOrder.length; g++) {
+    groupMap[groupOrder[g]].rows.sort(function(a, b) {
+      return cmpCol(a.deadlineColIdx, b.deadlineColIdx) ||
+             cmpCol(a.requestColIdx, b.requestColIdx);
+    });
+  }
+
+  // 그룹들을 최소 요청일 순으로 정렬 (stable — 같은 값이면 시트 등장 순 유지)
+  groupOrder.sort(function(a, b) {
+    return groupMap[a].minRequest - groupMap[b].minRequest;
+  });
+
+  // 그룹별 행을 차례로 이어붙임 + 빈 행 맨 아래
+  const sorted = [];
+  for (let g = 0; g < groupOrder.length; g++) {
+    sorted.push.apply(sorted, groupMap[groupOrder[g]].rows);
+  }
+  sorted.push.apply(sorted, emptyRows);
 
   dataRange.setValues(sorted.map(function(r) { return r.values; }));
   dataRange.setBackgrounds(sorted.map(function(r) { return r.backgrounds; }));
   memoRange.setNotes(sorted.map(function(r) { return [r.memo]; }));
   sheet.getRange(HUB_DATA_START_ROW, HUB_COL.공유, dataRowCount, 1).insertCheckboxes();
+
+  // 유효 행 영역에 B~끝열 #000 SOLID 격자 보더 — 신규·기존 행 모두 통일
+  const validCount = validRows.length;
+  if (validCount > 0) {
+    sheet.getRange(HUB_DATA_START_ROW, HUB_WRITE_COL_START, validCount, lastCol - HUB_WRITE_COL_START + 1)
+      .setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+  }
 }
 
 // ============================================================
